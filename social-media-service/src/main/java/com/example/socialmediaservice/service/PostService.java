@@ -1,10 +1,7 @@
 package com.example.socialmediaservice.service;
 
 
-import com.example.socialmediaservice.dto.CommentDTO;
-import com.example.socialmediaservice.dto.CreatePostRequestDTO;
-import com.example.socialmediaservice.dto.PostDTO;
-import com.example.socialmediaservice.dto.UpdatePostRequestDTO;
+import com.example.socialmediaservice.dto.*;
 import com.example.socialmediaservice.entity.Comment;
 import com.example.socialmediaservice.entity.Post;
 import com.example.socialmediaservice.entity.User;
@@ -13,12 +10,14 @@ import com.example.socialmediaservice.mapper.PostMapper;
 import com.example.socialmediaservice.repository.PostRepo;
 import com.example.socialmediaservice.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PostService {
@@ -30,8 +29,9 @@ public class PostService {
 
 
     // 1. Create Post
-    public PostDTO createPost(String userId, CreatePostRequestDTO createPostRequestDTO) {
-        User user = userRepo.findByUserId(userId)
+    public PostDTO createPost(String email, CreatePostRequestDTO createPostRequestDTO) {
+        log.info("email :{} post content:{}", email, createPostRequestDTO.getContent());
+        User user = userRepo.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Post post = new Post();
@@ -165,6 +165,41 @@ public class PostService {
         post.setContent(requestDTO.getContent());
         Post updatedPost = postRepo.save(post);
         return PostMapper.toDto(updatedPost);
+    }
+
+    public PostsPageDTO getForYouFeed(String cursor, int size) {
+        // Assuming cursor = postId of the last post from previous page
+        List<Post> posts;
+
+        if (cursor != null) {
+            posts = postRepo.findByPostIdLessThanOrderByCreatedAtDesc(cursor, PageRequest.of(0, size + 1));
+        } else {
+            posts = postRepo.findAllByOrderByCreatedAtDesc(PageRequest.of(0, size + 1));
+        }
+
+        boolean hasNext = posts.size() > size;
+        if (hasNext) {
+            posts = posts.subList(0, size);
+        }
+
+        List<PostDTO> postDTOs = posts.stream().map(post -> {
+            PostDTO dto = PostMapper.toDto(post);
+            dto.setComments(commentService.getCommentsByPost(post).stream().map(comment -> {
+                CommentDTO c = new CommentDTO();
+                c.setUserId(comment.getUser().getUserId());
+                c.setContent(comment.getContent());
+                c.setCreatedAt(comment.getCreatedAt());
+                return c;
+            }).collect(Collectors.toList()));
+            dto.setReactionCounts(reactionService.getReactionCounts(post));
+            return dto;
+        }).collect(Collectors.toList());
+
+        PostsPageDTO page = new PostsPageDTO();
+        page.setPosts(postDTOs);
+        page.setNextCursor(hasNext ? postDTOs.get(postDTOs.size() - 1).getPostId() : null);
+
+        return page;
     }
 
 }
