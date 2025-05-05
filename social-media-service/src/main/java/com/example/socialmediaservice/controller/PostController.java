@@ -2,6 +2,7 @@ package com.example.socialmediaservice.controller;
 
 import com.example.socialmediaservice.dto.CreatePostRequestDTO;
 import com.example.socialmediaservice.dto.PostDTO;
+import com.example.socialmediaservice.dto.PostsPageDTO;
 import com.example.socialmediaservice.dto.UpdatePostRequestDTO;
 import com.example.socialmediaservice.service.CommentService;
 import com.example.socialmediaservice.service.PostService;
@@ -27,7 +28,7 @@ public class PostController {
     public ResponseEntity<PostDTO> createPost(
 //            @PathVariable String userId,
             @RequestBody CreatePostRequestDTO createPostRequestDTO) {
-        return ResponseEntity.ok(postService.createPost(createPostRequestDTO.getUserId(), createPostRequestDTO));
+        return ResponseEntity.ok(postService.createPost(createPostRequestDTO.getEmail(), createPostRequestDTO));
     }
 
     // 2. Get all posts created by a specific user
@@ -50,5 +51,11 @@ public class PostController {
         return ResponseEntity.ok(postService.updatePost(postId, requestDTO));
     }
 
+    @GetMapping("/for-you")
+    public ResponseEntity<PostsPageDTO> getForYouPosts(
+            @RequestParam(required = false) String cursor,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(postService.getForYouFeed(cursor, size));
+    }
 
 }
