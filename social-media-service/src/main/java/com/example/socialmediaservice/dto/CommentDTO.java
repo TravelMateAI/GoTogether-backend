@@ -7,7 +7,8 @@ import java.util.List;
 
 @Data
 public class CommentDTO {
-    private String userId;
+    private String commentId;
+    private UserDTO user;
     private String content;
     private LocalDateTime createdAt;
     private String parentCommentId;

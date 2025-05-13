@@ -3,6 +3,7 @@ package com.example.socialmediaservice.service;
 
 import com.example.socialmediaservice.dto.*;
 import com.example.socialmediaservice.entity.Comment;
+import com.example.socialmediaservice.entity.Media;
 import com.example.socialmediaservice.entity.Post;
 import com.example.socialmediaservice.entity.User;
 import com.example.socialmediaservice.enums.ReactionType;
@@ -11,6 +12,7 @@ import com.example.socialmediaservice.repository.PostRepo;
 import com.example.socialmediaservice.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,36 +31,50 @@ public class PostService {
 
 
     // 1. Create Post
-    public PostDTO createPost(String email, CreatePostRequestDTO createPostRequestDTO) {
-        log.info("email :{} post content:{}", email, createPostRequestDTO.getContent());
+    public CreatePostResponseDTO createPost(String email, CreatePostRequestDTO createPostRequestDTO) {
+        log.info("email: {} | caption: {}", email, createPostRequestDTO.getCaption());
+
         User user = userRepo.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Post post = new Post();
-        post.setContent(createPostRequestDTO.getContent());
+        post.setCaption(createPostRequestDTO.getCaption());
         post.setUser(user);
+
+        // Link media if provided
+        if (createPostRequestDTO.getMediaIds() != null && !createPostRequestDTO.getMediaIds().isEmpty()) {
+            List<Media> mediaList = createPostRequestDTO.getMediaIds().stream()
+                    .map(id -> {
+                        Media media = new Media();
+                        media.setId(id);
+                        media.setPost(post); // Set the back-reference
+                        return media;
+                    })
+                    .collect(Collectors.toList());
+            post.setMediaList(mediaList);
+        }
+
         postRepo.save(post);
 
         return PostMapper.toDto(post);
     }
 
-    // 2. Get all posts created by a specific user
-
-//    public List<PostDTO> getPostsByUser(String userId) {
-//        return postRepo.findByUser_UserId(userId).stream()
-//                .map(PostMapper::toDto)
-//                .collect(Collectors.toList());
-//    }
 
     public List<PostDTO> getPostsByUser(String userId) {
         return postRepo.findByUser_UserId(userId).stream()
                 .map(post -> {
-                    PostDTO dto = PostMapper.toDto(post);
+                    PostDTO dto = PostMapper.toDto2(post);
+
+                    UserDTO user = new UserDTO();
+                    user.setId(post.getUser().getUserId());
+                    user.setUsername(post.getUser().getUsername());
+                    user.setDisplayName(post.getUser().getFirstName());
+                    user.setAvatarUrl(post.getUser().getAvatarUrl());
 
                     // Add comments
                     dto.setComments(commentService.getCommentsByPost(post).stream().map(comment -> {
                         CommentDTO c = new CommentDTO();
-                        c.setUserId(comment.getUser().getUserId());
+                        c.setUser(user);
                         c.setContent(comment.getContent());
                         c.setCreatedAt(comment.getCreatedAt());
                         return c;
@@ -73,38 +89,11 @@ public class PostService {
     }
 
 
-    // 3. Get post by ID with comments and reaction counts
-//    public PostDTO getPostById(String postId) {
-//        Post post = postRepo.findByPostId(postId);
-//        if (post == null) throw new RuntimeException("Post not found");
-//
-//        PostDTO postDTO = PostMapper.toDto(post);
-//
-//        // Fetch and map comments
-//        List<Comment> comments = commentService.getCommentsByPost(post);
-//        List<CommentDTO> commentDTOs = comments.stream().map(comment -> {
-//            CommentDTO dto = new CommentDTO();
-//            dto.setUserId(comment.getUser().getUserId()); // Assumes getUserId exists
-//            dto.setContent(comment.getContent());
-//            dto.setCreatedAt(comment.getCreatedAt());
-//            dto.setParentCommentId(comment.getParentComment().getCommentId());
-//            List<Comment> replies = commentService.getRepliesByParentComment(comment);
-//            return dto;
-//        }).collect(Collectors.toList());
-//        postDTO.setComments(commentDTOs);
-//
-//        // Get reaction counts
-//        Map<ReactionType, Long> reactionCounts = reactionService.getReactionCounts(post);
-//        postDTO.setReactionCounts(reactionCounts);
-//
-//        return postDTO;
-//    }
-
     public PostDTO getPostById(String postId) {
         Post post = postRepo.findByPostId(postId);
         if (post == null) throw new RuntimeException("Post not found");
 
-        PostDTO postDTO = PostMapper.toDto(post);
+        PostDTO postDTO = PostMapper.toDto2(post);
 
         // Fetch all comments for the post
         List<Comment> allComments = commentService.getCommentsByPost(post);
@@ -134,8 +123,13 @@ public class PostService {
     }
 
     private CommentDTO mapCommentWithReplies(Comment comment, Map<String, List<Comment>> repliesGroupedByParentId) {
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(comment.getUser().getUserId());
+        userDTO.setUsername(comment.getUser().getUsername());
+        userDTO.setDisplayName(comment.getUser().getFirstName());
+        userDTO.setAvatarUrl(comment.getUser().getAvatarUrl());
         CommentDTO dto = new CommentDTO();
-        dto.setUserId(comment.getUser().getUserId());
+        dto.setUser(userDTO);
         dto.setContent(comment.getContent());
         dto.setCreatedAt(comment.getCreatedAt());
         dto.setParentCommentId(comment.getParentComment() != null ? comment.getParentComment().getCommentId() : null);
@@ -153,25 +147,36 @@ public class PostService {
 
 
 
-//    //4. Get post by ID
-//    public PostDTO getPostById(String postId) {
-//        Post post = postRepo.findByPostId(postId);
-//        return PostMapper.toDto(post);
-//    }
-
     //4. Update post content
     public PostDTO updatePost(String postId, UpdatePostRequestDTO requestDTO) {
         Post post = postRepo.findByPostId(postId);
-        post.setContent(requestDTO.getContent());
+        if (post == null) throw new RuntimeException("Post not found");
+
+        post.setCaption(requestDTO.getCaption());
+
+        // Replace media list if provided
+        if (requestDTO.getMediaIds() != null) {
+            List<Media> updatedMediaList = requestDTO.getMediaIds().stream()
+                    .map(id -> {
+                        Media media = new Media();
+                        media.setId(id);
+                        media.setPost(post);
+                        return media;
+                    })
+                    .collect(Collectors.toList());
+            post.setMediaList(updatedMediaList);
+        }
+
         Post updatedPost = postRepo.save(post);
-        return PostMapper.toDto(updatedPost);
+        return PostMapper.toDto2(updatedPost);
     }
+
 
     public PostsPageDTO getForYouFeed(String cursor, int size) {
         // Assuming cursor = postId of the last post from previous page
         List<Post> posts;
 
-        if (cursor != null) {
+        if (cursor != null && !cursor.isBlank()) {
             posts = postRepo.findByPostIdLessThanOrderByCreatedAtDesc(cursor, PageRequest.of(0, size + 1));
         } else {
             posts = postRepo.findAllByOrderByCreatedAtDesc(PageRequest.of(0, size + 1));
@@ -183,15 +188,34 @@ public class PostService {
         }
 
         List<PostDTO> postDTOs = posts.stream().map(post -> {
-            PostDTO dto = PostMapper.toDto(post);
+            PostDTO dto = PostMapper.toDto2(post);
+
             dto.setComments(commentService.getCommentsByPost(post).stream().map(comment -> {
+                UserDTO userDTO = new UserDTO();
+                userDTO.setId(comment.getUser().getUserId());
+                userDTO.setUsername(comment.getUser().getUsername());
+                userDTO.setDisplayName(comment.getUser().getFirstName());
+                userDTO.setAvatarUrl(comment.getUser().getAvatarUrl());
                 CommentDTO c = new CommentDTO();
-                c.setUserId(comment.getUser().getUserId());
+                c.setUser(userDTO);
                 c.setContent(comment.getContent());
                 c.setCreatedAt(comment.getCreatedAt());
                 return c;
             }).collect(Collectors.toList()));
             dto.setReactionCounts(reactionService.getReactionCounts(post));
+            PostDTO.CountDTO count = new PostDTO.CountDTO();
+            count.setLikes(0);
+            count.setComments(0);
+            dto.set_count(count);
+            // Set flat list of users who reacted
+            dto.setReactions(post.getReactions() != null ?
+                    post.getReactions().stream().map(reaction -> {
+                        PostDTO.UserIdDTO r = new PostDTO.UserIdDTO();
+                        r.setUserId(reaction.getUser().getUserId());
+                        return r;
+                    }).collect(Collectors.toList())
+                    : List.of()
+            );
             return dto;
         }).collect(Collectors.toList());
 

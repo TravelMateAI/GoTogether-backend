@@ -20,8 +20,8 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String postId;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String content;
+    @Column(columnDefinition = "TEXT")
+    private String caption;  // ✅ Optional description field
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -35,5 +35,9 @@ public class Post {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Media> mediaList = new ArrayList<>(); // ✅ List of attached media (images/videos)
+
 
 }

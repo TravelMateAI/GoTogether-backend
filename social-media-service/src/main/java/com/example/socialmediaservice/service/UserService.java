@@ -1,7 +1,9 @@
 package com.example.socialmediaservice.service;
 
+import com.example.socialmediaservice.dto.UpdateProfileRequest;
 import com.example.socialmediaservice.entity.User;
 import com.example.socialmediaservice.repository.UserRepo;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -59,6 +61,12 @@ public class UserService {
         }
     }
 
+    public User updateAvatar(String userId, String avatarUrl) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
+        user.setAvatarUrl(avatarUrl);
+        return userRepository.save(user);
+    }
 
     private String getAdminAccessToken() {
         WebClient webClient = webClientBuilder.build();
@@ -115,4 +123,35 @@ public class UserService {
             }
         }
     }
+
+    public User getUserByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with email: " + email));
+        user.setPosts(null);
+        return user;
+    }
+
+    public User updateUserProfile(String userId, UpdateProfileRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        if (request.getDisplayName() != null) {
+            user.setUsername(request.getDisplayName()); // or setDisplayName if you have a field
+        }
+        if (request.getBio() != null) {
+            user.setBio(request.getBio());
+        }
+        if (request.getAvatarUrl() != null) {
+            user.setAvatarUrl(request.getAvatarUrl());
+        }
+
+        return userRepository.save(user);
+    }
+
+    public User getUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
+    }
+
+
 }
