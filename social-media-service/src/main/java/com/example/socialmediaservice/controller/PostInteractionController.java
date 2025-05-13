@@ -2,6 +2,8 @@ package com.example.socialmediaservice.controller;
 
 import com.example.socialmediaservice.dto.CommentDTO;
 import com.example.socialmediaservice.dto.ReplyCommentRequestDTO;
+import com.example.socialmediaservice.dto.RequestCommentDTO;
+import com.example.socialmediaservice.dto.UserDTO;
 import com.example.socialmediaservice.entity.Comment;
 import com.example.socialmediaservice.entity.Post;
 import com.example.socialmediaservice.entity.User;
@@ -13,16 +15,25 @@ import com.example.socialmediaservice.service.CommentService;
 import com.example.socialmediaservice.service.ReactionService;
 import lombok.RequiredArgsConstructor;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/posts")
+@RequestMapping("/api/posts")
 public class PostInteractionController {
 
     private final PostRepo postRepo;
@@ -33,23 +44,41 @@ public class PostInteractionController {
 
     // 1. Get all comments for a specific post
     @GetMapping("/{postId}/comments")
-    public ResponseEntity<List<CommentDTO>> getCommentsForPost(
-            @PathVariable String postId) {
+    public ResponseEntity<Map<String, Object>> getCommentsForPost(
+            @PathVariable String postId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size
+    ) {
         Post post = postRepo.findByPostId(postId);
         if (post == null) {
             return ResponseEntity.notFound().build();
         }
 
-        List<CommentDTO> commentDTOs = commentService.getCommentsByPost(post).stream().map(comment -> {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<Comment> commentPage = commentRepo.findByPost(post, pageable);
+
+        List<CommentDTO> commentDTOs = commentPage.stream().map(comment -> {
             CommentDTO dto = new CommentDTO();
-            dto.setUserId(comment.getUser().getUserId());
+            UserDTO userDTO = new UserDTO();
+            userDTO.setId(comment.getUser().getUserId());
+            userDTO.setUsername(comment.getUser().getUsername());
+            userDTO.setDisplayName(comment.getUser().getFirstName());
+            userDTO.setAvatarUrl(comment.getUser().getAvatarUrl());
+            dto.setCommentId(comment.getCommentId());
+            dto.setUser(userDTO);
             dto.setContent(comment.getContent());
             dto.setCreatedAt(comment.getCreatedAt());
             return dto;
-        }).collect(Collectors.toList());
+        }).toList();
 
-        return ResponseEntity.ok(commentDTOs);
+        Map<String, Object> response = new HashMap<>();
+        response.put("comments", commentDTOs);
+        response.put("hasNext", commentPage.hasNext());
+        response.put("nextPage", page + 1);
+
+        return ResponseEntity.ok(response);
     }
+
 
     // 2. Get reaction counts for a specific post
     @GetMapping("/{postId}/reactions")
@@ -67,10 +96,11 @@ public class PostInteractionController {
     @PostMapping("/{postId}/react")
     public ResponseEntity<Void> addOrUpdateReaction(@PathVariable String postId,
                                                     @RequestParam String userId,
-                                                    @RequestParam ReactionType type) {
+                                      @RequestParam ReactionType type) {
+
         Post post = postRepo.findByPostId(postId);
         if (post == null) return ResponseEntity.notFound().build();
-
+        System.out.println("UserID received: " + userId);
         User user = userRepo.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -81,8 +111,10 @@ public class PostInteractionController {
     // 4. Add comments to a post
     @PostMapping("{postId}/comment")
     public ResponseEntity<Void> addCommentToPost(@PathVariable String postId,
-                                                 @RequestBody CommentDTO requestDTO) {
+                                                 @RequestBody RequestCommentDTO requestDTO) {
+        log.info("PostId: {}, User: {}", postId, requestDTO.getUserId());
         Post post = postRepo.findByPostId(postId);
+
         if (post == null) return ResponseEntity.notFound().build();
 
         User user = userRepo.findByUserId(requestDTO.getUserId())
@@ -108,6 +140,24 @@ public class PostInteractionController {
         return ResponseEntity.ok().build();
     }
 
+    @DeleteMapping("/comments/{commentId}")
+    public ResponseEntity<Void> deleteComment(
+            @PathVariable String commentId,
+            @RequestParam String userId
+    ) {
+        log.info("CommentId: {}, UserId: {}", commentId, userId);
+        Comment comment = commentRepo.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("Comment not found"));
+
+//        log.info("Comment: {}", comment.toString());
+
+        if (!comment.getUser().getUserId().equals(userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        commentRepo.delete(comment);
+        return ResponseEntity.ok().build();
+    }
 
 
 }
