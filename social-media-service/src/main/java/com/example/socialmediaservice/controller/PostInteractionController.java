@@ -11,6 +11,7 @@ import com.example.socialmediaservice.enums.ReactionType;
 import com.example.socialmediaservice.repository.CommentRepo;
 import com.example.socialmediaservice.repository.PostRepo;
 import com.example.socialmediaservice.repository.UserRepo;
+import com.example.socialmediaservice.service.BookmarkService;
 import com.example.socialmediaservice.service.CommentService;
 import com.example.socialmediaservice.service.ReactionService;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +42,7 @@ public class PostInteractionController {
     private final CommentRepo commentRepo;
     private final CommentService commentService;
     private final ReactionService reactionService;
+    private final BookmarkService bookmarkService;
 
     // 1. Get all comments for a specific post
     @GetMapping("/{postId}/comments")
@@ -157,6 +159,35 @@ public class PostInteractionController {
 
         commentRepo.delete(comment);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{postId}/bookmark")
+    public ResponseEntity<Void> addBookmark(@PathVariable String postId, @RequestParam String userId) {
+        log.info("PostId: {}, UserId: {}", postId, userId);
+        Post post = postRepo.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found with ID: " + postId));
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+        bookmarkService.toggleBookmark(user, post);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{postId}/bookmark")
+    public ResponseEntity<Void> removeBookmark(@PathVariable String postId, @RequestParam String userId) {
+        return addBookmark(postId, userId); // toggle logic is same
+    }
+
+    @GetMapping("/{postId}/bookmark")
+    public ResponseEntity<Map<String, Boolean>> checkBookmark(@PathVariable String postId, @RequestParam String userId) {
+        Post post = postRepo.findByPostId(postId);
+        if (post == null) {
+            throw new RuntimeException("Post not found");
+        }
+        User user = userRepo.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+
+        boolean isBookmarked = bookmarkService.isBookmarkedByUser(user, post);
+        return ResponseEntity.ok(Map.of("isBookmarkedByUser", isBookmarked));
     }
 
 

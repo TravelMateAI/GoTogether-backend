@@ -6,5 +6,5 @@ import lombok.Data;
 public class UpdateProfileRequest {
     private String displayName;
     private String bio;
-    private String avatarUrl;
+    private String avatarUrl; // optional
 }

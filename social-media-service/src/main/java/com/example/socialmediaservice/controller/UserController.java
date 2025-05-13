@@ -1,6 +1,8 @@
 package com.example.socialmediaservice.controller;
 
+import com.example.socialmediaservice.dto.FollowerInfo;
 import com.example.socialmediaservice.dto.UpdateProfileRequest;
+import com.example.socialmediaservice.dto.UpdateProfileResponse;
 import com.example.socialmediaservice.entity.User;
 import com.example.socialmediaservice.service.UserService;
 import lombok.Data;
@@ -49,14 +51,13 @@ public class UserController {
     }
 
     @PutMapping("/{userId}/profile")
-    public ResponseEntity<User> updateUserProfile(
+    public ResponseEntity<UpdateProfileResponse> updateUserProfile(
             @PathVariable String userId,
             @RequestBody UpdateProfileRequest request
     ) {
-        User updated = userService.updateUserProfile(userId, request);
+        UpdateProfileResponse updated = userService.updateUserProfile(userId, request);
         return ResponseEntity.ok(updated);
     }
-
 
     @Data
     static class RegisterRequest {
@@ -71,4 +72,32 @@ public class UserController {
     static class AvatarUpdateRequest {
         private String avatarUrl;
     }
+
+    @PostMapping("/{targetUserId}/followers")
+    public ResponseEntity<Void> followUser(
+            @PathVariable String targetUserId,
+            @RequestParam String followerUserId
+    ) {
+        userService.followUser(followerUserId, targetUserId);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{targetUserId}/followers")
+    public ResponseEntity<Void> unfollowUser(
+            @PathVariable String targetUserId,
+            @RequestParam String followerUserId
+    ) {
+        userService.unfollowUser(followerUserId, targetUserId);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{targetUserId}/follower-info")
+    public ResponseEntity<FollowerInfo> getFollowerInfo(
+            @PathVariable String targetUserId,
+            @RequestParam String currentUserId
+    ) {
+        FollowerInfo info = userService.getFollowerInfo(currentUserId, targetUserId);
+        return ResponseEntity.ok(info);
+    }
+
 }

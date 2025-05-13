@@ -5,7 +5,9 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
@@ -45,10 +47,10 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "follower_id")
     )
     @JsonIgnoreProperties("followers") // Prevent full circular graph
-    private List<User> followers = new ArrayList<>();
+    private Set<User> followers = new HashSet<>();
 
     @ManyToMany(mappedBy = "followers")
     @JsonIgnoreProperties("following")
-    private List<User> following = new ArrayList<>();
+    private Set<User> following = new HashSet<>();
 
 }

@@ -1,6 +1,8 @@
 package com.example.socialmediaservice.service;
 
+import com.example.socialmediaservice.dto.FollowerInfo;
 import com.example.socialmediaservice.dto.UpdateProfileRequest;
+import com.example.socialmediaservice.dto.UpdateProfileResponse;
 import com.example.socialmediaservice.entity.User;
 import com.example.socialmediaservice.repository.UserRepo;
 import jakarta.persistence.EntityNotFoundException;
@@ -131,12 +133,12 @@ public class UserService {
         return user;
     }
 
-    public User updateUserProfile(String userId, UpdateProfileRequest request) {
+    public UpdateProfileResponse updateUserProfile(String userId, UpdateProfileRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         if (request.getDisplayName() != null) {
-            user.setUsername(request.getDisplayName()); // or setDisplayName if you have a field
+            user.setFirstName(request.getDisplayName()); // ✅ assuming 'firstName' is your displayName
         }
         if (request.getBio() != null) {
             user.setBio(request.getBio());
@@ -145,12 +147,60 @@ public class UserService {
             user.setAvatarUrl(request.getAvatarUrl());
         }
 
-        return userRepository.save(user);
+        User saved = userRepository.save(user);
+        return new UpdateProfileResponse(
+                saved.getUserId(),
+                saved.getUsername(),
+                saved.getFirstName(),
+                saved.getAvatarUrl(),
+                saved.getBio()
+        );
     }
+
 
     public User getUserByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
+    }
+
+    public void followUser(String followerId, String targetUserId) {
+        if (followerId.equals(targetUserId)) {
+            throw new IllegalArgumentException("You cannot follow yourself.");
+        }
+
+        User follower = userRepository.findByUserId(followerId)
+                .orElseThrow(() -> new RuntimeException("Follower not found"));
+        User target = userRepository.findByUserId(targetUserId)
+                .orElseThrow(() -> new RuntimeException("Target user not found"));
+
+        if (!follower.getFollowing().contains(target)) {
+            follower.getFollowing().add(target);
+            userRepository.save(follower);
+        }
+    }
+
+    public void unfollowUser(String followerId, String targetUserId) {
+        User follower = userRepository.findByUserId(followerId)
+                .orElseThrow(() -> new RuntimeException("Follower not found"));
+        User target = userRepository.findByUserId(targetUserId)
+                .orElseThrow(() -> new RuntimeException("Target user not found"));
+
+        if (follower.getFollowing().contains(target)) {
+            follower.getFollowing().remove(target);
+            userRepository.save(follower);
+        }
+    }
+
+    public FollowerInfo getFollowerInfo(String currentUserId, String targetUserId) {
+        User current = userRepository.findByUserId(currentUserId)
+                .orElseThrow(() -> new RuntimeException("Current user not found"));
+        User target = userRepository.findByUserId(targetUserId)
+                .orElseThrow(() -> new RuntimeException("Target user not found"));
+
+        boolean isFollowing = current.getFollowing().contains(target);
+        int followersCount = target.getFollowers().size();
+
+        return new FollowerInfo(followersCount, isFollowing);
     }
 
 
