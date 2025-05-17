@@ -2,13 +2,18 @@ package com.example.socialmediaservice.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
+@ToString(exclude = {"followers", "following"})
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(name = "users")
 public class User {
 
@@ -38,17 +43,14 @@ public class User {
     @JsonIgnoreProperties("user") // Prevent recursion during serialization
     private List<Post> posts = new ArrayList<>();
 
-    @ManyToMany
-    @JoinTable(
-            name = "followers",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "follower_id")
-    )
-    @JsonIgnoreProperties("followers") // Prevent full circular graph
-    private List<User> followers = new ArrayList<>();
+    @ElementCollection
+    @CollectionTable(name = "user_followers", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "follower_user_id")
+    private Set<String> followerIds = new HashSet<>();
 
-    @ManyToMany(mappedBy = "followers")
-    @JsonIgnoreProperties("following")
-    private List<User> following = new ArrayList<>();
+    @ElementCollection
+    @CollectionTable(name = "user_following", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "following_user_id")
+    private Set<String> followingIds = new HashSet<>();
 
 }
