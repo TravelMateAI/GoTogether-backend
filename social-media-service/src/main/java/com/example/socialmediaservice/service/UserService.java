@@ -8,12 +8,14 @@ import com.example.socialmediaservice.repository.UserRepo;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.http.MediaType;
 import org.springframework.http.HttpHeaders;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -132,6 +134,13 @@ public class UserService {
         user.setPosts(null);
         return user;
     }
+    public User getUserById(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
+        user.setPosts(null);
+        return user;
+    }
+
 
     public UpdateProfileResponse updateUserProfile(String userId, UpdateProfileRequest request) {
         User user = userRepository.findById(userId)
@@ -163,6 +172,7 @@ public class UserService {
                 .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
     }
 
+    @Transactional
     public void followUser(String followerId, String targetUserId) {
         if (followerId.equals(targetUserId)) {
             throw new IllegalArgumentException("You cannot follow yourself.");
@@ -173,35 +183,51 @@ public class UserService {
         User target = userRepository.findByUserId(targetUserId)
                 .orElseThrow(() -> new RuntimeException("Target user not found"));
 
-        if (!follower.getFollowing().contains(target)) {
-            follower.getFollowing().add(target);
+        boolean added = follower.getFollowingIds().add(targetUserId);
+        target.getFollowerIds().add(followerId);
+
+        log.info("Added: {} | Target: {}", added, targetUserId);
+        log.info("Follower: {} | Target: {}", followerId, targetUserId);
+        log.info("Follower: {} | Target: {}", follower.getFollowingIds().toString(), target.getFollowerIds().toString() );
+
+        if (added) {
             userRepository.save(follower);
+            userRepository.save(target);
         }
     }
 
+    @Transactional
     public void unfollowUser(String followerId, String targetUserId) {
+        if (followerId.equals(targetUserId)) {
+            throw new IllegalArgumentException("You cannot unfollow yourself.");
+        }
+
         User follower = userRepository.findByUserId(followerId)
                 .orElseThrow(() -> new RuntimeException("Follower not found"));
         User target = userRepository.findByUserId(targetUserId)
                 .orElseThrow(() -> new RuntimeException("Target user not found"));
 
-        if (follower.getFollowing().contains(target)) {
-            follower.getFollowing().remove(target);
+        boolean removedFromFollowing = follower.getFollowingIds().remove(targetUserId);
+        boolean removedFromFollowers = target.getFollowerIds().remove(followerId);
+        log.info("RemovedFromFollowing: {} | RemovedFromFollowers: {}", removedFromFollowing, removedFromFollowers);
+        log.info("Follower: {} | Target: {}", followerId, targetUserId);
+        log.info("Follower: {} | Target: {}", follower.getFollowingIds().toString(), target.getFollowerIds().toString() );
+
+        if (removedFromFollowing || removedFromFollowers) {
             userRepository.save(follower);
+            userRepository.save(target);
         }
     }
 
+
     public FollowerInfo getFollowerInfo(String currentUserId, String targetUserId) {
-        User current = userRepository.findByUserId(currentUserId)
-                .orElseThrow(() -> new RuntimeException("Current user not found"));
         User target = userRepository.findByUserId(targetUserId)
                 .orElseThrow(() -> new RuntimeException("Target user not found"));
 
-        boolean isFollowing = current.getFollowing().contains(target);
-        int followersCount = target.getFollowers().size();
+        boolean isFollowing = target.getFollowerIds().contains(currentUserId);
+        int count = target.getFollowerIds().size();
 
-        return new FollowerInfo(followersCount, isFollowing);
+        return new FollowerInfo(count, isFollowing);
     }
-
 
 }

@@ -44,6 +44,15 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
+    @GetMapping("/{userId}")
+    public ResponseEntity<User> getUserById(@PathVariable String userId) {
+        if (userId == null || userId.isBlank()) {
+            throw new IllegalArgumentException("UserId path variable is missing");
+        }
+        User user = userService.getUserById(userId); // ✅ now it's consistent
+        return ResponseEntity.ok(user);
+    }
+
     @GetMapping("/username/{username}")
     public ResponseEntity<User> getUserByUsername(@PathVariable String username) {
         User user = userService.getUserByUsername(username);
