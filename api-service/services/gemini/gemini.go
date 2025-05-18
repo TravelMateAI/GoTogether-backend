@@ -1,14 +1,27 @@
 package gemini
 
 import (
-	"context"
-
 	"api-service/config"
+	"context"
+	"net/http"
+	"time"
 
 	"google.golang.org/genai"
 )
 
-func CallGeminiAPI(prompt string) (*genai.GenerateContentResponse, error) {
+type AIService struct {
+	client *http.Client
+	apiKey string
+}
+
+func NewAIService(apiKey string) *AIService {
+	return &AIService{
+		client: &http.Client{Timeout: 10 * time.Second},
+		apiKey: apiKey,
+	}
+}
+
+func (ais *AIService) GetAIResponse(prompt string) (interface{}, error) {
 	ctx := context.Background()
 	client, err := genai.NewClient(ctx, &genai.ClientConfig{
 		APIKey:  config.GetEnv("GOOGLE_GEMINI_API_KEY", ""),

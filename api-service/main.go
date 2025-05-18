@@ -9,7 +9,7 @@ import (
 
 func main() {
 	config.LoadEnv()
-	port := config.GetEnv("PORT", "8080")
+	port := config.GetEnv("PORT", "8000")
 
 	r := gin.Default()
 	routes.RegisterRoutes(r)

@@ -7,18 +7,24 @@ import (
 )
 
 func RegisterRoutes(r *gin.Engine) {
-	api := r.Group("/api")
+
+	maps := r.Group("/maps")
 	{
-		maps := api.Group("/maps")
-		{
-			maps.GET("/geocode", controllers.GeocodeController)
-			maps.GET("/places", controllers.LocationDataController)
-		}
-		gemini := api.Group("/gemini")
-		{
-			gemini.GET("/location-summery", controllers.LocationSummeryController)
-		}
+		// Example: GET /maps/geocode?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA
+		maps.GET("/geocode", controllers.GeocodeController)
+		// Example: GET /maps/places?query=restaurant&location=37.4224764,-122.0842499
+		maps.GET("/places", controllers.LocationDataController)
+		// Example: GET /maps/directions?origin=Toronto&destination=Montreal
+		maps.GET("/directions", controllers.DirectionsController)
+		// Example: GET /maps/distance-matrix?origins=Seattle&destinations=San+Francisco
+		maps.GET("/distance-matrix", controllers.DistanceMatrixController)
 	}
+	gemini := r.Group("/gemini")
+	{
+		// Example: GET /gemini?prompt=explain+about+life+100+words
+		gemini.GET("/", controllers.GeminiController)
+	}
+
 	test := r.Group("/test")
 	{
 		test.GET("/", func(c *gin.Context) {
