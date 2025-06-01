@@ -9,11 +9,16 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.http.MediaType;
 import org.springframework.http.HttpHeaders;
 import reactor.core.publisher.Mono;
+
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -26,6 +31,51 @@ public class UserService {
     private final String keycloakUrl = "http://localhost:8081";
     private final String adminUsername = "admin";
     private final String adminPassword = "admin";
+
+    public User getUserByEmailFromToken(String accessToken) {
+        WebClient webClient = webClientBuilder.build();
+
+        Map<String, Object> userInfo = webClient.get()
+                .uri(keycloakUrl + "/realms/kong/protocol/openid-connect/userinfo")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
+                .block();
+
+        if (userInfo == null || !userInfo.containsKey("email")) {
+            throw new RuntimeException("Failed to fetch user info from Keycloak");
+        }
+
+        String email = userInfo.get("email").toString();
+        return getUserByEmail(email);
+    }
+
+    public String authenticateWithKeycloak(String username, String password) {
+        WebClient webClient = webClientBuilder.build();
+
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("grant_type", "password");
+        formData.add("client_id", "kong-oidc");
+        formData.add("client_secret", "fBHJFdikM0ERtTXnvebguHRz6iPUfJfV"); // Move to env or config!
+        formData.add("username", username);
+        formData.add("password", password);
+        formData.add("scope", "openid profile email");
+
+        TokenResponse tokenResponse = webClient.post()
+                .uri(keycloakUrl + "/realms/kong/protocol/openid-connect/token")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue(formData)
+                .retrieve()
+                .bodyToMono(TokenResponse.class)
+                .block();
+
+        if (tokenResponse == null || tokenResponse.getAccessToken() == null) {
+            throw new RuntimeException("Login failed: Unable to retrieve access token from Keycloak");
+        }
+
+        return tokenResponse.getAccessToken();
+    }
+
 
     @Transactional
     public User registerUser(String username, String email, String password,String firstName,String lastName) {

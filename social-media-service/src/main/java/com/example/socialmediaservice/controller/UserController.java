@@ -1,22 +1,69 @@
 package com.example.socialmediaservice.controller;
 
 import com.example.socialmediaservice.dto.FollowerInfo;
+import com.example.socialmediaservice.dto.LoginRequestDTO;
 import com.example.socialmediaservice.dto.UpdateProfileRequest;
 import com.example.socialmediaservice.dto.UpdateProfileResponse;
 import com.example.socialmediaservice.entity.User;
 import com.example.socialmediaservice.service.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
+
+@Slf4j
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*") // <-- Allow your frontend to call backend
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class UserController {
 
     private final UserService userService;
+
+    @PostMapping("/auth/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequestDTO loginRequest, HttpServletResponse response) {
+        String token = userService.authenticateWithKeycloak(loginRequest.getUsername(), loginRequest.getPassword());
+        User user = userService.getUserByEmailFromToken(token); // use Keycloak userinfo
+        user.setPosts(null);
+//         Set SameSite manually because Spring doesn't support it directly in ResponseCookie
+        String accessTokenHeader = ResponseCookie.from("access_token", token)
+                .httpOnly(true)
+                .secure(false) // <--- IMPORTANT for localhost!
+                .path("/")
+                .maxAge(3600)
+                .build().toString() + "; SameSite=Lax";
+
+        String userCookieHeader = ResponseCookie.from("user", serializeUser(user))
+                .httpOnly(false)
+                .secure(false) // <--- Same
+                .path("/")
+                .maxAge(3600)
+                .build().toString() + "; SameSite=Lax";
+
+        response.addHeader(HttpHeaders.SET_COOKIE, accessTokenHeader);
+        response.addHeader(HttpHeaders.SET_COOKIE, userCookieHeader);
+
+        log.info("User {} login successful", user.getUsername());
+        log.info( serializeUser(user));
+
+        return ResponseEntity.ok(Map.of(
+                "accessToken", token,
+                "user", serializeUser(user)
+        ));
+
+    }
+
 
     @PostMapping("/register")
     public User registerUser(@RequestBody RegisterRequest request) {
@@ -108,5 +155,24 @@ public class UserController {
         FollowerInfo info = userService.getFollowerInfo(currentUserId, targetUserId);
         return ResponseEntity.ok(info);
     }
+    public String serializeUser(User user) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            Map<String, Object> minimalUser = new HashMap<>();
+            minimalUser.put("userId", user.getUserId());
+            minimalUser.put("username", user.getUsername());
+            minimalUser.put("firstName", user.getFirstName());
+            minimalUser.put("avatarUrl", user.getAvatarUrl());
 
-}
+            String json = objectMapper.writeValueAsString(minimalUser);
+            return Base64.getUrlEncoder().encodeToString(json.getBytes(StandardCharsets.UTF_8));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to serialize user for cookie", e);
+        }
+    }
+
+    }
+
+
+
+
