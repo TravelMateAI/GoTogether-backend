@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/pipeline")
 public class PipelineController {
 
+    private static final Logger log = LoggerFactory.getLogger(PipelineController.class);
     private final PipelineManager<String> pipelineManager;
 
     public PipelineController(PipelineManager<String> pipelineManager) {
