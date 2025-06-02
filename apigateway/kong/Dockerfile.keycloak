@@ -1,0 +1,9 @@
+FROM quay.io/keycloak/keycloak:24.0
+
+USER root
+RUN mkdir -p /opt/keycloak-scripts
+COPY keycloak-setup.sh /opt/keycloak-scripts/keycloak-setup.sh
+RUN chmod +x /opt/keycloak-scripts/keycloak-setup.sh
+
+USER keycloak
+ENTRYPOINT ["/opt/keycloak-scripts/keycloak-setup.sh"]

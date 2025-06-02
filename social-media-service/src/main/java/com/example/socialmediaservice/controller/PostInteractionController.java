@@ -1,9 +1,6 @@
 package com.example.socialmediaservice.controller;
 
-import com.example.socialmediaservice.dto.CommentDTO;
-import com.example.socialmediaservice.dto.ReplyCommentRequestDTO;
-import com.example.socialmediaservice.dto.RequestCommentDTO;
-import com.example.socialmediaservice.dto.UserDTO;
+import com.example.socialmediaservice.dto.*;
 import com.example.socialmediaservice.entity.Comment;
 import com.example.socialmediaservice.entity.Post;
 import com.example.socialmediaservice.entity.User;
@@ -180,6 +177,7 @@ public class PostInteractionController {
     @GetMapping("/{postId}/bookmark")
     public ResponseEntity<Map<String, Boolean>> checkBookmark(@PathVariable String postId, @RequestParam String userId) {
         Post post = postRepo.findByPostId(postId);
+        log.info("Post id {}", postId);
         if (post == null) {
             throw new RuntimeException("Post not found");
         }
@@ -190,5 +188,14 @@ public class PostInteractionController {
         return ResponseEntity.ok(Map.of("isBookmarkedByUser", isBookmarked));
     }
 
+    @GetMapping("/bookmarked")
+    public ResponseEntity<PostsPageDTO> getBookmarkedPosts(
+            @RequestParam String userId,
+            @RequestParam(required = false) String cursor,
+            @RequestParam(defaultValue = "10") int size) {
 
+        log.info(" Fetch bookmarked posts | UserId: {}, Cursor: {}, Size: {}", userId, cursor, size);
+        PostsPageDTO result = bookmarkService.getBookmarkedPosts(userId, cursor, size);
+        return ResponseEntity.ok(result);
+    }
 }

@@ -1,7 +1,6 @@
-version: '3'
+version: "3"
 
-x-kong-config:
-  &kong-env
+x-kong-config: &kong-env
   KONG_DATABASE: ${KONG_DATABASE:-postgres}
   KONG_PG_DATABASE: ${KONG_PG_DATABASE:-kong}
   KONG_PG_HOST: kong-database
@@ -27,57 +26,58 @@ networks:
       config:
         - subnet: 172.1.1.0/24
 
-
 services:
   ################################################
   #                   Keycloak                   #
   ################################################
-  keycloak-db:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_DB: keycloak
-      POSTGRES_USER: keycloak
-      POSTGRES_PASSWORD: mykeycloakpassword
-    volumes:
-      - keycloak_db:/var/lib/postgresql/data
-    networks:
-      - kong-net
-    healthcheck:
-      test: ["CMD", "pg_isready", "-d", "keycloak", "-U", "keycloak"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-    restart: unless-stopped
+  # keycloak-db:
+  #   image: postgres:16-alpine
+  #   environment:
+  #     POSTGRES_DB: keycloak
+  #     POSTGRES_USER: keycloak
+  #     POSTGRES_PASSWORD: mykeycloakpassword
+  #   volumes:
+  #     - keycloak_db:/var/lib/postgresql/data
+  #   networks:
+  #     - kong-net
+  #   healthcheck:
+  #     test: ["CMD", "pg_isready", "-d", "keycloak", "-U", "keycloak"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
+  #   restart: unless-stopped
 
   keycloak:
-    image: quay.io/keycloak/keycloak:24.0
-    command: 
+    build:
+      context: .
+      dockerfile: Dockerfile.keycloak
+    command:
       - start-dev
       - --http-enabled=true
       - --hostname-strict=false
       - --hostname-strict-https=false
-      - import
-      - --import-realm
-      - --import-path=/opt/keycloak/data/import
+      # - import
+      # - --import-realm
+      # - --import-path=/opt/keycloak/data/import
     environment:
       KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak
-      KC_DB_USERNAME: keycloak
-      KC_DB_PASSWORD: mykeycloakpassword
+      KC_DB_URL: "jdbc:postgresql://aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=require&connectTimeout=10"
+      KC_DB_USERNAME: postgres.ucutsnncgapnsylikrxk
+      KC_DB_PASSWORD: Postgres@2025
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
       KC_HOSTNAME_URL: http://localhost:8081
-      volumes:
-        - ./keycloak-import:/opt/keycloak/data/import
-
+      KEYCLOAK_IMPORT: /opt/keycloak/data/import/kong-realm.json
+    volumes:
+      - ./keycloak-import:/opt/keycloak/data/import
     networks:
       - kong-net
     ports:
       - "8445:8443"
       - "8081:8080"
-    depends_on:
-      keycloak-db:
-        condition: service_healthy
+    # depends_on:
+    #   keycloak-db:
+    #     condition: service_healthy
     restart: unless-stopped
   ################################################
   # Kong components (Kong & PostgreSQL Database) #
@@ -170,4 +170,3 @@ services:
   #     - kong-net
   #   volumes:
   #     - kong_data:/var/lib/postgresql/data
-      

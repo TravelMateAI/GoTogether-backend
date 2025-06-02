@@ -64,4 +64,23 @@ public class PostMapper {
 
         return dto;
     }
+
+    public static PostDTO toDTO(Post post) {
+            PostDTO dto = new PostDTO();
+            dto.setPostId(post.getPostId());
+            dto.setCaption(post.getCaption());
+            dto.setCreatedAt(post.getCreatedAt());
+
+            UserDTO userDTO = new UserDTO();
+            userDTO.setId(post.getUser().getUserId());
+            userDTO.setUsername(post.getUser().getUsername());
+            userDTO.setAvatarUrl(post.getUser().getAvatarUrl());
+            dto.setUser(userDTO);
+
+            // Optional: populate counts, reactions, attachments, etc. here
+
+            return dto;
+        }
+
+
 }
