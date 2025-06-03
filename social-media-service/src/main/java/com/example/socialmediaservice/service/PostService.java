@@ -2,10 +2,7 @@ package com.example.socialmediaservice.service;
 
 
 import com.example.socialmediaservice.dto.*;
-import com.example.socialmediaservice.entity.Comment;
-import com.example.socialmediaservice.entity.Media;
-import com.example.socialmediaservice.entity.Post;
-import com.example.socialmediaservice.entity.User;
+import com.example.socialmediaservice.entity.*;
 import com.example.socialmediaservice.enums.ReactionType;
 import com.example.socialmediaservice.mapper.PostMapper;
 import com.example.socialmediaservice.repository.PostRepo;
@@ -28,6 +25,7 @@ public class PostService {
     private final UserRepo userRepo;
     private final ReactionService reactionService;
     private final CommentService commentService;
+    private final BookmarkService bookmarkService;
 
 
     // 1. Create Post
@@ -190,32 +188,53 @@ public class PostService {
         List<PostDTO> postDTOs = posts.stream().map(post -> {
             PostDTO dto = PostMapper.toDto2(post);
 
-            dto.setComments(commentService.getCommentsByPost(post).stream().map(comment -> {
+            // Get comments
+            List<CommentDTO> commentDTOs = commentService.getCommentsByPost(post).stream().map(comment -> {
                 UserDTO userDTO = new UserDTO();
                 userDTO.setId(comment.getUser().getUserId());
                 userDTO.setUsername(comment.getUser().getUsername());
                 userDTO.setDisplayName(comment.getUser().getFirstName());
                 userDTO.setAvatarUrl(comment.getUser().getAvatarUrl());
-                CommentDTO c = new CommentDTO();
-                c.setUser(userDTO);
-                c.setContent(comment.getContent());
-                c.setCreatedAt(comment.getCreatedAt());
-                return c;
-            }).collect(Collectors.toList()));
-            dto.setReactionCounts(reactionService.getReactionCounts(post));
-            PostDTO.CountDTO count = new PostDTO.CountDTO();
-            count.setLikes(0);
-            count.setComments(0);
-            dto.set_count(count);
+
+                CommentDTO commentDTO = new CommentDTO();
+                commentDTO.setUser(userDTO);
+                commentDTO.setContent(comment.getContent());
+                commentDTO.setCreatedAt(comment.getCreatedAt());
+                return commentDTO;
+            }).collect(Collectors.toList());
+            dto.setComments(commentDTOs);
+
+            // Reactions
+            Map<ReactionType, Long> reactionCounts = reactionService.getReactionCounts(post);
+            dto.setReactionCounts(reactionCounts);
+
             // Set flat list of users who reacted
             dto.setReactions(post.getReactions() != null ?
                     post.getReactions().stream().map(reaction -> {
-                        PostDTO.UserIdDTO r = new PostDTO.UserIdDTO();
+                        PostDTO.ReactionDTO r = new PostDTO.ReactionDTO();
                         r.setUserId(reaction.getUser().getUserId());
+                        r.setReactionType(reaction.getType()); // Assuming Reaction entity has getType()
                         return r;
                     }).collect(Collectors.toList())
                     : List.of()
             );
+
+            // Bookmarks (from bookmarkService, since Post doesn't have them)
+            List<Bookmark> bookmarks = bookmarkService.getBookmarksByPost(post); // ← you must implement this
+            dto.setBookmarks(bookmarks != null ?
+                    bookmarks.stream().map(bookmark -> {
+                        PostDTO.UserIdDTO b = new PostDTO.UserIdDTO();
+                        b.setUserId(bookmark.getUser().getUserId());
+                        return b;
+                    }).collect(Collectors.toList())
+                    : List.of()
+            );
+
+            PostDTO.CountDTO count = new PostDTO.CountDTO();
+            count.setLikes(0);
+            count.setComments(commentDTOs.size());
+            dto.set_count(count);
+
             return dto;
         }).collect(Collectors.toList());
 

@@ -26,7 +26,7 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, String> {
             @Param("cursor") String cursor,
             Pageable pageable
     );
-
+    List<Bookmark> findAllByPost(Post post);
     boolean existsByUserAndPost(User user, Post post);
 }
 

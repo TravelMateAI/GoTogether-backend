@@ -18,7 +18,8 @@ public class PostDTO {
     private List<MediaDTO> attachments;
     private List<CommentDTO> comments;
     private Map<ReactionType, Long> reactionCounts;
-    private List<UserIdDTO> reactions;
+    private List<ReactionDTO> reactions;
+    private List<UserIdDTO> bookmarks;
 
     private CountDTO _count;
 
@@ -30,6 +31,12 @@ public class PostDTO {
     @Data
     public static class UserIdDTO {
         private String userId;
+    }
+
+    @Data
+    public static class ReactionDTO {
+        private String userId;
+        private ReactionType reactionType;
     }
 }
 

@@ -3,3 +3,8 @@
 /.idea
 /gradle
 /bin
+**/.idea/
+**/build/
+**/.gradle/
+**/gradle/
+**/bin/
