@@ -22,6 +22,7 @@ type PlacesResponse struct {
 			Height         int    `json:"height"`
 			Width          int    `json:"width"`
 		} `json:"photos,omitempty"`
+		PhotoURLs        []string `json:"photo_urls,omitempty"`
 	} `json:"results"`
 	Status string `json:"status"`
 }
