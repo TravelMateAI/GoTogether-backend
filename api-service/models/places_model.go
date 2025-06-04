@@ -93,7 +93,7 @@ type PlaceDetailResult struct {
 	FormattedPhoneNumber     string             `json:"formatted_phone_number,omitempty"`
 	OpeningHours             *PlaceOpeningHours `json:"opening_hours,omitempty"` // Pointer as it can be null
 	Vicinity                 string             `json:"vicinity,omitempty"`
-	UTCOffset                int                `json:"utc_offset_minutes,omitempty"` // UTC offset in minutes
+	UTCOffset                int                `json:"utc_offset,omitempty"` // UTC offset in minutes
 	AddressComponents        []struct {
 		LongName  string   `json:"long_name"`
 		ShortName string   `json:"short_name"`

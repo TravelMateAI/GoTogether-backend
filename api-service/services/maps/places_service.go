@@ -24,7 +24,7 @@ func NewPlacesService() *PlacesService {
 func (s *PlacesService) FindPlaceByID(placeID string) (*models.PlaceDetailResponse, error) {
 	var response models.PlaceDetailResponse // Initialize response struct
 
-	fields := "name,rating,formatted_phone_number,photo,review,website,opening_hours,geometry,place_id,type,vicinity,address_component,utc_offset_minutes,user_ratings_total,formatted_address,international_phone_number"
+	fields := "name,rating,formatted_phone_number,photo,review,website,opening_hours,geometry,place_id,type,vicinity,address_component,utc_offset,user_ratings_total,formatted_address,international_phone_number"
 	url := fmt.Sprintf("https://maps.googleapis.com/maps/api/place/details/json?place_id=%s&fields=%s&key=%s", placeID, fields, config.GetEnv("GOOGLE_MAPS_API_KEY", ""))
 
 	resp, err := s.client.Get(url)
