@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.4.3'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'com.google.protobuf' version '0.9.4'
 }
 
 group = 'org.example'
@@ -32,8 +33,47 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.kafka:spring-kafka-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    implementation 'io.grpc:grpc-protobuf:1.58.0'
+    implementation 'io.grpc:grpc-stub:1.58.0'
+    implementation 'io.grpc:grpc-netty-shaded:1.58.0'
+    compileOnly 'org.apache.tomcat:annotations-api:6.0.53'
+    // For Java 17+ if not already present, as gRPC might need it:
+    // implementation 'javax.annotation:javax.annotation-api:1.3.2'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+protobuf {
+  protoc {
+    artifact = "com.google.protobuf:protoc:3.24.0"
+  }
+  plugins {
+    grpc {
+      artifact = 'io.grpc:protoc-gen-grpc-java:1.58.0'
+    }
+  }
+  generateProtoTasks {
+    all().each { task ->
+      task.plugins {
+        grpc {}
+      }
+      // task.protoSourceDir = file("../../proto") // This was the problematic line
+      // task.include("communication.proto") // This should also be handled by source sets
+    }
+  }
+}
+
+// Configure the proto source set (added by the protobuf plugin)
+sourceSets {
+  main {
+    proto {
+      // Point to the directory containing .proto files
+      srcDirs = ['../proto']
+      // Include specific files if needed, otherwise all .proto files in srcDirs are included
+      // include 'communication.proto'
+    }
+  }
 }
