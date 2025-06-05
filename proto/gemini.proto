@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package gemini_proto;
+
+option go_package = "api-service/grpc/pb/gemini";
+option java_package = "com.example.planning.grpc.apiservice.gemini";
+option java_multiple_files = true;
+
+// Gemini Service
+service Gemini {
+  rpc GenerateContent(GeminiRequest) returns (GeminiResponse);
+}
+
+message GeminiRequest {
+  string prompt = 1;
+}
+message GeminiResponse {
+  message SafetyRating {
+    string category = 1;
+    string probability = 2;
+  }
+  message ContentPart {
+    string text = 1;
+  }
+  message Content {
+    repeated ContentPart parts = 1;
+    string role = 2;
+  }
+  message Candidate {
+    Content content = 1;
+    string finish_reason = 2;
+    int32 index = 3;
+    repeated SafetyRating safety_ratings = 4;
+  }
+  message PromptFeedback {
+    repeated SafetyRating safety_ratings = 2;
+  }
+  repeated Candidate candidates = 1;
+  PromptFeedback prompt_feedback = 2;
+}

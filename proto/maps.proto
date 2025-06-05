@@ -1,0 +1,149 @@
+syntax = "proto3";
+
+package maps_proto;
+
+option go_package = "api-service/grpc/pb/maps";
+option java_package = "com.example.planning.grpc.apiservice.maps";
+option java_multiple_files = true;
+
+// Maps Service
+service Maps {
+  rpc Geocode(GeocodeRequest) returns (GeocodeResponse);
+  rpc SearchPlaces(SearchPlacesRequest) returns (SearchPlacesResponse);
+  rpc GetPlaceDetails(PlaceDetailsRequest) returns (PlaceDetailsResponse);
+  rpc GetDirections(DirectionsRequest) returns (DirectionsResponse);
+  rpc GetDistanceMatrix(DistanceMatrixRequest) returns (DistanceMatrixResponse);
+}
+
+// --- Geocoding ---
+message GeocodeRequest {
+  string address = 1;
+}
+message GeocodeResponse {
+  message Location {
+    double lat = 1;
+    double lng = 2;
+  }
+  message Result {
+    string formatted_address = 1;
+    Location location = 2;
+  }
+  repeated Result results = 1;
+  string status = 2;
+}
+
+// --- Places Search ---
+message SearchPlacesRequest {
+  string query = 1;
+  string location = 2;
+}
+message Place {
+  message Location {
+    double lat = 1;
+    double lng = 2;
+  }
+  message OpeningHours {
+    bool open_now = 1;
+  }
+  message Photo {
+    string photo_reference = 1;
+    int32 height = 2;
+    int32 width = 3;
+  }
+  string place_id = 1;
+  string name = 2;
+  string vicinity = 3;
+  double rating = 4;
+  int32 user_ratings_total = 5;
+  Location geometry_location = 6;
+  OpeningHours opening_hours = 7;
+  repeated Photo photos = 8;
+  repeated string photo_urls = 9;
+  repeated string types = 10;
+}
+message SearchPlacesResponse {
+  repeated Place results = 1;
+  string status = 2;
+}
+
+// --- Place Details ---
+message PlaceDetailsRequest {
+  string place_id = 1;
+}
+message PlaceDetailsResponse {
+  Place result = 1;
+  string status = 2;
+}
+
+// --- Directions ---
+message DirectionsRequest {
+  string origin = 1;
+  string destination = 2;
+}
+message DirectionsResponse {
+  message Distance {
+    string text = 1;
+    int32 value = 2; // meters
+  }
+  message Duration {
+    string text = 1;
+    int32 value = 2; // seconds
+  }
+  message Polyline {
+    string points = 1;
+  }
+  message Step {
+    string html_instructions = 1;
+    Distance distance = 2;
+    Duration duration = 3;
+    Polyline polyline = 4;
+  }
+  message Leg {
+    Distance distance = 1;
+    Duration duration = 2;
+    string start_address = 3;
+    string end_address = 4;
+    repeated Step steps = 5;
+  }
+  message Route {
+    string summary = 1;
+    repeated Leg legs = 2;
+    Polyline overview_polyline = 3;
+  }
+  message GeocodedWaypoint {
+    string geocoder_status = 1;
+    string place_id = 2;
+    repeated string types = 3;
+  }
+  repeated Route routes = 1;
+  repeated GeocodedWaypoint geocoded_waypoints = 2;
+  string status = 3;
+}
+
+// --- Distance Matrix ---
+message DistanceMatrixRequest {
+  string origins = 1;
+  string destinations = 2;
+}
+message DistanceMatrixResponse {
+  repeated string origin_addresses = 1;
+  repeated string destination_addresses = 2;
+  message Element {
+    message Duration {
+      string text = 1;
+      int32 value = 2; // seconds
+    }
+    message Distance {
+      string text = 1;
+      int32 value = 2; // meters
+    }
+    string status = 1;
+    Duration duration = 2;
+    Distance distance = 3;
+  }
+  message Row {
+    repeated Element elements = 1;
+  }
+  repeated Row rows = 3;
+  string status = 4;
+}

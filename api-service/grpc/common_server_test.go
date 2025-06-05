@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
-	pb "api-service/proto_generated_go/proto" // Adjust if your generated path is different
+	pb_common "api-service/grpc/pb/common" // Updated import
 )
 
 func TestSayHello(t *testing.T) {
-	s := Server{} // Our gRPC server implementation
+	s := ExampleGreeterServerImpl{} // Use specific server implementation
 
 	tests := []struct {
 		name    string
@@ -34,7 +34,7 @@ func TestSayHello(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			req := &pb.HelloRequest{Name: tt.reqName}
+			req := &pb_common.HelloRequest{Name: tt.reqName} // Updated type
 			resp, err := s.SayHello(context.Background(), req)
 			if err != nil {
 				t.Fatalf("SayHello(%v) got unexpected error: %v", req, err)
