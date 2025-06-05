@@ -125,16 +125,17 @@ func (s *MapsServerImpl) SearchPlaces(ctx context.Context, req *pb_maps.SearchPl
 			Types:            placeResultItem.Types,
 			PhotoUrls:        placeResultItem.PhotoURLs,
 		}
-		if placeResultItem.Geometry != nil && placeResultItem.Geometry.Location != nil {
+		// placeResultItem.Geometry.Location is a struct as per places_model.go for PlacesResponse.Results[].Geometry.Location
+		if placeResultItem.Geometry.Location.Lat != 0 || placeResultItem.Geometry.Location.Lng != 0 {
 			pbPlace.GeometryLocation = &pb_maps.Place_Location{
 				Lat: placeResultItem.Geometry.Location.Lat,
 				Lng: placeResultItem.Geometry.Location.Lng,
 			}
 		}
-		if placeResultItem.OpeningHours != nil {
-			pbPlace.OpeningHours = &pb_maps.Place_OpeningHours{
-				OpenNow: placeResultItem.OpeningHours.OpenNow,
-			}
+		// placeResultItem.OpeningHours is a struct. Direct assignment for OpenNow is fine.
+		// If placeResultItem.OpeningHours is a zero struct, OpenNow will be its default (false).
+		pbPlace.OpeningHours = &pb_maps.Place_OpeningHours{
+			OpenNow: placeResultItem.OpeningHours.OpenNow,
 		}
 		var pbPhotos []*pb_maps.Place_Photo
 		for _, photo := range placeResultItem.Photos {
@@ -169,15 +170,17 @@ func (s *MapsServerImpl) GetPlaceDetails(ctx context.Context, req *pb_maps.Place
 		return nil, status.Errorf(codes.Internal, "FindPlaceByID service returned nil response")
 	}
 
-	if serviceResponse.Status != "OK" || serviceResponse.Result == nil {
-		log.Printf("FindPlaceByID service returned status: %s", serviceResponse.Status)
+	// serviceResponse.Result is a struct (PlaceDetailResult).
+	// Check PlaceID for emptiness if status is OK.
+	if serviceResponse.Status != "OK" || (serviceResponse.Status == "OK" && serviceResponse.Result.PlaceID == "") {
+		log.Printf("FindPlaceByID service returned status: %s or (Status=OK and PlaceID is empty)", serviceResponse.Status)
 		return &pb_maps.PlaceDetailsResponse{
 			Status: serviceResponse.Status,
-			Result: nil,
+			Result: nil, // Treat as no result if PlaceID is empty or status not OK
 		}, nil
 	}
 
-	result := serviceResponse.Result
+	result := serviceResponse.Result // result is of type models.PlaceDetailResult (a struct)
 	pbPlace := &pb_maps.Place{
 		PlaceId:          result.PlaceID,
 		Name:             result.Name,
@@ -191,12 +194,14 @@ func (s *MapsServerImpl) GetPlaceDetails(ctx context.Context, req *pb_maps.Place
 	} else {
 		pbPlace.Vicinity = result.FormattedAddress
 	}
-	if result.Geometry != nil && result.Geometry.Location != nil {
+	// result.Geometry.Location is a struct as per places_model.go for PlaceDetailResult.Geometry.Location
+	if result.Geometry.Location.Lat != 0 || result.Geometry.Location.Lng != 0 {
 		pbPlace.GeometryLocation = &pb_maps.Place_Location{
 			Lat: result.Geometry.Location.Lat,
 			Lng: result.Geometry.Location.Lng,
 		}
 	}
+	// result.OpeningHours is a pointer (*models.PlaceOpeningHours), so nil check is correct.
 	if result.OpeningHours != nil {
 		pbPlace.OpeningHours = &pb_maps.Place_OpeningHours{
 			OpenNow: result.OpeningHours.OpenNow,
@@ -359,11 +364,9 @@ func (s *MapsServerImpl) GetDistanceMatrix(ctx context.Context, req *pb_maps.Dis
 		return nil, status.Errorf(codes.Internal, "DistanceMatrixService returned nil response")
 	}
 
-	pbResp := &pb_maps.DistanceMatrixResponse{
-		OriginAddresses:      serviceResponse.OriginAddresses,
-		DestinationAddresses: serviceResponse.DestinationAddresses,
-		Status:               serviceResponse.Status,
-	}
+	// serviceResponse from maps.DistanceMatrixService only contains Rows.
+	// OriginAddresses, DestinationAddresses, and overall Status are part of the proto but not this service model.
+	pbResp := &pb_maps.DistanceMatrixResponse{}
 
 	var pbRows []*pb_maps.DistanceMatrixResponse_Row
 	for _, serviceRow := range serviceResponse.Rows {
@@ -371,13 +374,15 @@ func (s *MapsServerImpl) GetDistanceMatrix(ctx context.Context, req *pb_maps.Dis
 		var pbElements []*pb_maps.DistanceMatrixResponse_Element
 		for _, serviceElement := range serviceRow.Elements {
 			pbElement := &pb_maps.DistanceMatrixResponse_Element{Status: serviceElement.Status}
-			if serviceElement.Duration != nil {
+			// serviceElement.Duration is a struct, check its fields for meaningful data
+			if serviceElement.Duration.Text != "" || serviceElement.Duration.Value != 0 {
 				pbElement.Duration = &pb_maps.DistanceMatrixResponse_Element_Duration{
 					Text:  serviceElement.Duration.Text,
 					Value: int32(serviceElement.Duration.Value),
 				}
 			}
-			if serviceElement.Distance != nil {
+			// serviceElement.Distance is a struct, check its fields for meaningful data
+			if serviceElement.Distance.Text != "" || serviceElement.Distance.Value != 0 {
 				pbElement.Distance = &pb_maps.DistanceMatrixResponse_Element_Distance{
 					Text:  serviceElement.Distance.Text,
 					Value: int32(serviceElement.Distance.Value),
@@ -390,8 +395,7 @@ func (s *MapsServerImpl) GetDistanceMatrix(ctx context.Context, req *pb_maps.Dis
 	}
 	pbResp.Rows = pbRows
 
-	if serviceResponse.Status != "OK" {
-		log.Printf("DistanceMatrixService returned non-OK status: %s", serviceResponse.Status)
-	}
+	// serviceResponse.Status does not exist on maps.DistanceMatrixResponse from the service.
+	// The status for each element is handled within the element itself.
 	return pbResp, nil
 }
