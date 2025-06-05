@@ -3,7 +3,7 @@ package main
 import (
 	"api-service/config"
 	grpchandler "api-service/grpc" // Alias for your gRPC server package
-	pb "api-service/proto_generated_go/proto" // Alias for your generated proto package
+	pb "api-service/grpc/pb"       // Updated generated proto package
 	"api-service/routes"
 	"log"
 	"net"
@@ -23,7 +23,10 @@ func main() {
 			log.Fatalf("failed to listen for gRPC: %v", err)
 		}
 		s := grpc.NewServer()
-		pb.RegisterGreeterServer(s, &grpchandler.Server{}) // Assumes your server struct is named Server
+		// Register all new services
+		pb.RegisterExampleGreeterServer(s, &grpchandler.ExampleGreeterServerImpl{})
+		pb.RegisterMapsServer(s, &grpchandler.MapsServerImpl{})
+		pb.RegisterGeminiServer(s, &grpchandler.GeminiServerImpl{})
 		log.Printf("gRPC server listening at %v", lis.Addr())
 		if err := s.Serve(lis); err != nil {
 			log.Fatalf("failed to serve gRPC: %v", err)
