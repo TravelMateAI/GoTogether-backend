@@ -1,14 +1,17 @@
 package org.example.planningservice.controller;
 
-import org.example.planningservice.grpc.apiservice.common.HelloReply; // Added for GreeterClient
-import org.example.planningservice.grpc.apiservice.gemini.GeminiResponse;
-import org.example.planningservice.grpc.apiservice.maps.*;
-import org.example.planningservice.grpc.client.GeminiClient;
-import org.example.planningservice.grpc.client.GreeterClient; // Corrected import
-import org.example.planningservice.grpc.client.MapsClient;
+
+import org.example.planningservice.dto.request.*;
+import org.example.planningservice.dto.response.*;
+import org.example.planningservice.service.grpc.MapService;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.example.planningservice.grpc.client.GreeterClient;
+import org.example.planningservice.grpc.client.GeminiClient;
+import org.example.planningservice.grpc.apiservice.common.HelloReply;
+import org.example.planningservice.grpc.apiservice.gemini.GeminiResponse;
+
 
 @RestController
 @RequestMapping("/test/grpc")
@@ -16,50 +19,39 @@ public class GrpcTestController {
 
     private final GreeterClient greeterClient;
     private final GeminiClient geminiClient;
-    private final MapsClient mapsClient;
+    private final MapService mapService;
 
     @Autowired
-    public GrpcTestController(GreeterClient greeterClient, GeminiClient geminiClient, MapsClient mapsClient) {
+    public GrpcTestController(GreeterClient greeterClient, GeminiClient geminiClient, MapService mapService) {
         this.greeterClient = greeterClient;
         this.geminiClient = geminiClient;
-        this.mapsClient = mapsClient;
+        this.mapService = mapService;
     }
 
-    // GreeterClient endpoint
     @GetMapping("/hello")
     public ResponseEntity<String> sayHello(@RequestParam(defaultValue = "World") String name) {
         try {
-            // Assuming GreeterClient has a method sayHello that returns HelloReply
-            // and GreeterClient itself is correctly imported and autowired.
-            // The original GreeterClient had a method `greet(String name)` which returned void
-            // and logged. It was changed to `sayHello` and to return HelloReply in the prompt.
-            // Let's ensure GreeterClient actually has this method.
-            // For now, assuming it's:
-            // HelloReply reply = greeterClient.greet(name); // If greet was changed to return HelloReply
-            // Or if a new method sayHello was added:
-            org.example.planningservice.grpc.apiservice.common.HelloReply reply = greeterClient.sayHello(name);
+            HelloReply reply = greeterClient.sayHello(name);
             return ResponseEntity.ok(reply.getMessage());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error calling Greeter service: " + e.getMessage());
         }
     }
 
-    // GeminiClient endpoint
     @GetMapping("/gemini/generate")
     public ResponseEntity<?> generateContent(@RequestParam String prompt) {
         try {
             GeminiResponse response = geminiClient.generateContent(prompt);
-            return ResponseEntity.ok(response); // Consider converting to a more friendly JSON if needed
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error calling Gemini service: " + e.getMessage());
         }
     }
 
-    // MapsClient endpoints
     @GetMapping("/maps/geocode")
     public ResponseEntity<?> geocode(@RequestParam String address) {
         try {
-            GeocodeResponse response = mapsClient.geocode(address);
+            GeocodeResponseDTO response = mapService.geocode(new GeocodeRequestDTO(address));
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error calling Maps Geocode: " + e.getMessage());
@@ -69,7 +61,7 @@ public class GrpcTestController {
     @GetMapping("/maps/search")
     public ResponseEntity<?> searchPlaces(@RequestParam String query, @RequestParam String location) {
         try {
-            SearchPlacesResponse response = mapsClient.searchPlaces(query, location);
+            SearchPlacesResponseDTO response = mapService.searchPlaces(new SearchPlacesRequestDTO(query, location));
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error calling Maps SearchPlaces: " + e.getMessage());
@@ -79,7 +71,7 @@ public class GrpcTestController {
     @GetMapping("/maps/details/{placeId}")
     public ResponseEntity<?> getPlaceDetails(@PathVariable String placeId) {
         try {
-            PlaceDetailsResponse response = mapsClient.getPlaceDetails(placeId);
+            PlaceDetailsResponseDTO response = mapService.getPlaceDetails(placeId);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error calling Maps GetPlaceDetails: " + e.getMessage());
@@ -89,7 +81,7 @@ public class GrpcTestController {
     @GetMapping("/maps/directions")
     public ResponseEntity<?> getDirections(@RequestParam String origin, @RequestParam String destination) {
         try {
-            DirectionsResponse response = mapsClient.getDirections(origin, destination);
+            DirectionsResponseDTO response = mapService.getDirections(new DirectionsRequestDTO(origin, destination));
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error calling Maps GetDirections: " + e.getMessage());
@@ -99,7 +91,7 @@ public class GrpcTestController {
     @GetMapping("/maps/distancematrix")
     public ResponseEntity<?> getDistanceMatrix(@RequestParam String origins, @RequestParam String destinations) {
         try {
-            DistanceMatrixResponse response = mapsClient.getDistanceMatrix(origins, destinations);
+            DistanceMatrixResponseDTO response = mapService.getDistanceMatrix(new DistanceMatrixRequestDTO(origins, destinations));
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error calling Maps GetDistanceMatrix: " + e.getMessage());

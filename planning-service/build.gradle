@@ -1,8 +1,8 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.4.3'
+    id 'org.springframework.boot' version '3.4.1'
     id 'io.spring.dependency-management' version '1.1.7'
-    id 'com.google.protobuf' version '0.9.4'
+    id 'com.google.protobuf' version '0.9.2'
 }
 
 group = 'org.example'
@@ -14,15 +14,6 @@ java {
     }
 }
 
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
-    compileProtoPath {
-        exclude group: 'com.fasterxml.jackson.datatype', module: 'jackson-datatype-protobuf'
-    }
-}
-
 repositories {
     mavenCentral()
 }
@@ -30,19 +21,22 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.kafka:spring-kafka'
+
     compileOnly 'org.projectlombok:lombok'
-    runtimeOnly 'com.h2database:h2'
     annotationProcessor 'org.projectlombok:lombok'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.kafka:spring-kafka-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    implementation 'net.devh:grpc-spring-boot-starter:3.0.0.RELEASE'
-    implementation 'com.google.protobuf:protobuf-java:3.24.0'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-protobuf:2.18.2'
+    implementation 'com.fasterxml:classmate:1.5.1'
+
+    implementation 'io.grpc:grpc-netty-shaded:1.57.2'
+    implementation 'io.grpc:grpc-protobuf:1.57.2'
+    implementation 'io.grpc:grpc-stub:1.57.2'
+    implementation 'com.google.protobuf:protobuf-java:3.24.4'
+
     compileOnly 'org.apache.tomcat:annotations-api:6.0.53'
-    // For Java 17+ if not already present, as gRPC might need it:
-    // implementation 'javax.annotation:javax.annotation-api:1.3.2'
 }
 
 tasks.named('test') {
@@ -50,33 +44,28 @@ tasks.named('test') {
 }
 
 protobuf {
-  protoc {
-    artifact = "com.google.protobuf:protoc:3.24.0"
-  }
-  plugins {
-    grpc {
-      artifact = 'io.grpc:protoc-gen-grpc-java:1.58.0'
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.24.4"
     }
-  }
-  generateProtoTasks {
-    all().each { task ->
-      task.plugins {
-        grpc {}
-      }
-      // task.protoSourceDir = file("../../proto") // This was the problematic line
-      // task.include("communication.proto") // This should also be handled by source sets
+    plugins {
+        grpc {
+            artifact = "io.grpc:protoc-gen-grpc-java:1.57.2"
+        }
     }
-  }
+    generateProtoTasks {
+        all().each { task ->
+            task.plugins {
+                grpc {}
+            }
+        }
+    }
 }
 
-// Configure the proto source set (added by the protobuf plugin)
 sourceSets {
-  main {
-    proto {
-      // Point to the directory containing .proto files
-      srcDirs = ['../proto']
-      // Include specific files if needed, otherwise all .proto files in srcDirs are included
-      // include 'communication.proto'
+    main {
+        proto {
+            // Points to ../proto relative to planning-service/
+            srcDirs = ['../proto']
+        }
     }
-  }
 }
