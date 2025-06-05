@@ -1,8 +1,8 @@
 package com.example.planning.grpc.client;
 
-import com.example.planning.grpc.GreeterGrpc;
-import com.example.planning.grpc.HelloRequest;
-import com.example.planning.grpc.HelloReply;
+import com.example.planning.grpc.apiservice.common.ExampleGreeterGrpc;
+import com.example.planning.grpc.apiservice.common.HelloRequest;
+import com.example.planning.grpc.apiservice.common.HelloReply;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import java.util.concurrent.TimeUnit;
@@ -13,7 +13,7 @@ public class GreeterClient {
     private static final Logger logger = Logger.getLogger(GreeterClient.class.getName());
 
     private final ManagedChannel channel;
-    private final GreeterGrpc.GreeterBlockingStub blockingStub;
+    private final ExampleGreeterGrpc.ExampleGreeterBlockingStub blockingStub;
 
     /** Construct client connecting to Greeter server at {@code host:port}. */
     public GreeterClient(String host, int port) {
@@ -27,7 +27,7 @@ public class GreeterClient {
     /** Construct client for accessing Greeter server using the existing channel. */
     GreeterClient(ManagedChannel channel) {
         this.channel = channel;
-        blockingStub = GreeterGrpc.newBlockingStub(channel);
+        blockingStub = ExampleGreeterGrpc.newBlockingStub(channel);
     }
 
     public void shutdown() throws InterruptedException {
