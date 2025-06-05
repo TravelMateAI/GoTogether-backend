@@ -1,8 +1,8 @@
-package com.example.planning.grpc.client;
+package org.example.planningservice.grpc.client;
 
-import com.example.planning.grpc.apiservice.common.ExampleGreeterGrpc;
-import com.example.planning.grpc.apiservice.common.HelloRequest;
-import com.example.planning.grpc.apiservice.common.HelloReply;
+import org.example.planningservice.grpc.apiservice.common.ExampleGreeterGrpc;
+import org.example.planningservice.grpc.apiservice.common.HelloRequest;
+import org.example.planningservice.grpc.apiservice.common.HelloReply;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import org.springframework.beans.factory.annotation.Value;

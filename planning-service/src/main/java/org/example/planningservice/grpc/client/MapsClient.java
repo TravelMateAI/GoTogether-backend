@@ -1,6 +1,6 @@
-package com.example.planning.grpc.client;
+package org.example.planningservice.grpc.client;
 
-import com.example.planning.grpc.apiservice.maps.*; // Import all maps grpc classes
+import org.example.planningservice.grpc.apiservice.maps.*; // Import all maps grpc classes
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +18,7 @@ public class MapsClient {
     @Value("${api.service.host:localhost}")
     private String apiServiceHost;
 
-    @Value("${api.service.port:50051}")
+    @Value("${api.service.port:8001}")
     private int apiServicePort;
 
     @PostConstruct

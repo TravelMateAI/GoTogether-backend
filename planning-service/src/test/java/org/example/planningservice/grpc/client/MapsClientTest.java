@@ -1,10 +1,11 @@
-package com.example.planning.grpc.client;
+package org.example.planningservice.grpc.client;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.example.planningservice.PlanningServiceApplication;
+import org.example.planningservice.grpc.client.MapsClient; // Updated import
 
 @SpringBootTest(classes = PlanningServiceApplication.class)
 public class MapsClientTest {

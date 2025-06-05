@@ -1,11 +1,11 @@
-package com.example.planning.controller;
+package org.example.planningservice.controller;
 
-import com.example.planning.grpc.apiservice.common.HelloReply; // Added for GreeterClient
-import com.example.planning.grpc.apiservice.gemini.GeminiResponse;
-import com.example.planning.grpc.apiservice.maps.*;
-import com.example.planning.grpc.client.GeminiClient;
-import com.example.planning.grpc.client.GreeterClient; // Corrected import
-import com.example.planning.grpc.client.MapsClient;
+import org.example.planningservice.grpc.apiservice.common.HelloReply; // Added for GreeterClient
+import org.example.planningservice.grpc.apiservice.gemini.GeminiResponse;
+import org.example.planningservice.grpc.apiservice.maps.*;
+import org.example.planningservice.grpc.client.GeminiClient;
+import org.example.planningservice.grpc.client.GreeterClient; // Corrected import
+import org.example.planningservice.grpc.client.MapsClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +37,7 @@ public class GrpcTestController {
             // For now, assuming it's:
             // HelloReply reply = greeterClient.greet(name); // If greet was changed to return HelloReply
             // Or if a new method sayHello was added:
-            com.example.planning.grpc.apiservice.common.HelloReply reply = greeterClient.sayHello(name);
+            org.example.planningservice.grpc.apiservice.common.HelloReply reply = greeterClient.sayHello(name);
             return ResponseEntity.ok(reply.getMessage());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error calling Greeter service: " + e.getMessage());

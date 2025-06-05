@@ -3,7 +3,7 @@ syntax = "proto3";
 package common_proto;
 
 option go_package = "api-service/grpc/pb/common";
-option java_package = "com.example.planning.grpc.apiservice.common";
+option java_package = "org.example.planningservice.grpc.apiservice.common";
 option java_multiple_files = true;
 
 service ExampleGreeter {
