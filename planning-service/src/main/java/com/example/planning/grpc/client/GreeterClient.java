@@ -5,64 +5,62 @@ import com.example.planning.grpc.apiservice.common.HelloRequest;
 import com.example.planning.grpc.apiservice.common.HelloReply;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@Service
 public class GreeterClient {
     private static final Logger logger = Logger.getLogger(GreeterClient.class.getName());
 
-    private final ManagedChannel channel;
-    private final ExampleGreeterGrpc.ExampleGreeterBlockingStub blockingStub;
+    private ManagedChannel channel;
+    private ExampleGreeterGrpc.ExampleGreeterBlockingStub blockingStub;
 
-    /** Construct client connecting to Greeter server at {@code host:port}. */
-    public GreeterClient(String host, int port) {
-        this(ManagedChannelBuilder.forAddress(host, port)
-                // Channels are secure by default (via SSL/TLS). For the example we disable TLS to avoid
-                // needing certificates.
-                .usePlaintext()
-                .build());
-    }
+    @Value("${api.service.host:localhost}")
+    private String apiServiceHost;
 
-    /** Construct client for accessing Greeter server using the existing channel. */
-    GreeterClient(ManagedChannel channel) {
-        this.channel = channel;
+    @Value("${api.service.port:8001}") // Matches the updated port in application.properties
+    private int apiServicePort;
+
+    @PostConstruct
+    private void init() {
+        logger.info("Initializing GreeterClient for " + apiServiceHost + ":" + apiServicePort);
+        channel = ManagedChannelBuilder.forAddress(apiServiceHost, apiServicePort)
+                .usePlaintext() // For simplicity in dev; use SSL/TLS in production
+                .build();
         blockingStub = ExampleGreeterGrpc.newBlockingStub(channel);
     }
 
+    @PreDestroy
     public void shutdown() throws InterruptedException {
-        channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
+        if (channel != null) {
+            logger.info("Shutting down GreeterClient channel");
+            channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
+        }
     }
 
     /** Say hello to server. */
-    public void greet(String name) {
-        logger.info("Will try to greet " + name + " ...");
+    public HelloReply sayHello(String name) {
+        logger.info("Attempting to greet " + name + " via gRPC...");
         HelloRequest request = HelloRequest.newBuilder().setName(name).build();
-        HelloReply response;
+        // The try-catch block can be here for logging, or removed if errors are to be handled by the caller (controller)
         try {
-            response = blockingStub.sayHello(request);
+            HelloReply response = blockingStub.sayHello(request);
+            logger.info("Successfully greeted " + name + ". Response: " + response.getMessage());
+            return response;
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "RPC failed: " + e.getMessage(), e);
-            return;
+            logger.log(Level.SEVERE, "gRPC call to Greeter service failed for name: " + name, e);
+            throw e; // Re-throw the exception to be handled by the controller
         }
-        logger.info("Greeting: " + response.getMessage());
     }
 
     /**
      * Greet server. If provided, the first element of {@code args} is the name to use in the
      * greeting.
      */
-    public static void main(String[] args) throws Exception {
-        // Access a service running on the local machine on port 50051.
-        GreeterClient client = new GreeterClient("localhost", 50051);
-        try {
-            String user = "world";
-            if (args.length > 0) {
-                user = args[0]; /* Use the arg as the name to greet if provided */
-            }
-            client.greet(user);
-        } finally {
-            client.shutdown();
-        }
-    }
+    // Main method removed as this class is now a Spring managed bean
 }
