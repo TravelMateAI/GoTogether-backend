@@ -18,6 +18,9 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
+    compileProtoPath {
+        exclude group: 'com.fasterxml.jackson.datatype', module: 'jackson-datatype-protobuf'
+    }
 }
 
 repositories {
