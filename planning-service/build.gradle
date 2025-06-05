@@ -34,7 +34,7 @@ dependencies {
     testImplementation 'org.springframework.kafka:spring-kafka-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    implementation 'net.devh:grpc-spring-boot-starter:2.14.0.RELEASE'
+    implementation 'net.devh:grpc-spring-boot-starter:3.0.0.RELEASE'
     implementation 'com.google.protobuf:protobuf-java:3.24.0'
     compileOnly 'org.apache.tomcat:annotations-api:6.0.53'
     // For Java 17+ if not already present, as gRPC might need it:
