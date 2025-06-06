@@ -1,10 +1,50 @@
-**/.idea/
-**/build/
-**/.gradle/
-**/gradle/
-**/bin/
+# General
 .idea/
 .gradle/
 build/
 gradle/
 bin/
+out/
+
+# IntelliJ IDEA
+*.iws
+*.iml
+*.ipr
+/shelf/
+/workspace.xml
+/httpRequests/
+/mavenHomeManager.xml
+/dataSources/
+/dataSources.local.xml
+
+# STS
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# VS Code
+.vscode/
+
+# Specific to planning-service
+planning-service/HELP.md
+planning-service/secret_keys.txt
+
+# Negations (keep these at the end)
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+!**/src/main/**/out/
+!**/src/test/**/out/

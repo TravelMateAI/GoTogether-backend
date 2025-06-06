@@ -14,6 +14,9 @@ func RegisterRoutes(r *gin.Engine) {
 		maps.GET("/geocode", controllers.GeocodeController)
 		// Example: GET /maps/places?query=restaurant&location=37.4224764,-122.0842499
 		maps.GET("/places", controllers.LocationDataController)
+		// New route for place details by ID:
+		// Example: GET /maps/place/ChIJN1t_tDeuEmsRUsoyG83frY4
+		maps.GET("/place/:place_id", controllers.PlaceDetailsController)
 		// Example: GET /maps/directions?origin=Toronto&destination=Montreal
 		maps.GET("/directions", controllers.DirectionsController)
 		// Example: GET /maps/distance-matrix?origins=Seattle&destinations=San+Francisco
