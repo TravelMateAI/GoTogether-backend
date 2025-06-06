@@ -3,36 +3,40 @@ package org.example.planningservice.controller;
 
 import org.example.planningservice.dto.request.*;
 import org.example.planningservice.dto.response.*;
+import org.example.planningservice.service.grpc.GeminiService;
+import org.example.planningservice.service.grpc.GreeterService; // Added
 import org.example.planningservice.service.grpc.MapService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.example.planningservice.grpc.client.GreeterClient;
-import org.example.planningservice.grpc.client.GeminiClient;
-import org.example.planningservice.grpc.apiservice.common.HelloReply;
-import org.example.planningservice.grpc.apiservice.gemini.GeminiResponse;
+// import org.example.planningservice.grpc.client.GreeterClient; // Removed
+// import org.example.planningservice.grpc.client.GeminiClient; // Removed
+// import org.example.planningservice.grpc.apiservice.common.HelloReply; // Removed
+// import org.example.planningservice.grpc.apiservice.gemini.GeminiResponse; // Removed
 
 
 @RestController
 @RequestMapping("/test/grpc")
 public class GrpcTestController {
 
-    private final GreeterClient greeterClient;
-    private final GeminiClient geminiClient;
+    // private final GreeterClient greeterClient; // Removed
+    private final GreeterService greeterService; // Added
+    private final GeminiService geminiService;
     private final MapService mapService;
 
     @Autowired
-    public GrpcTestController(GreeterClient greeterClient, GeminiClient geminiClient, MapService mapService) {
-        this.greeterClient = greeterClient;
-        this.geminiClient = geminiClient;
+    public GrpcTestController(GreeterService greeterService, GeminiService geminiService, MapService mapService) { // Updated constructor
+        this.greeterService = greeterService; // Updated
+        this.geminiService = geminiService;
         this.mapService = mapService;
     }
 
     @GetMapping("/hello")
     public ResponseEntity<String> sayHello(@RequestParam(defaultValue = "World") String name) {
         try {
-            HelloReply reply = greeterClient.sayHello(name);
-            return ResponseEntity.ok(reply.getMessage());
+            GreeterRequestDTO requestDTO = new GreeterRequestDTO(name);
+            GreeterResponseDTO responseDTO = greeterService.sayHello(requestDTO);
+            return ResponseEntity.ok(responseDTO.getMessage());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error calling Greeter service: " + e.getMessage());
         }
@@ -41,8 +45,9 @@ public class GrpcTestController {
     @GetMapping("/gemini/generate")
     public ResponseEntity<?> generateContent(@RequestParam String prompt) {
         try {
-            GeminiResponse response = geminiClient.generateContent(prompt);
-            return ResponseEntity.ok(response);
+            GeminiRequestDTO requestDTO = new GeminiRequestDTO(prompt);
+            GeminiResponseDTO responseDTO = geminiService.generateContent(requestDTO);
+            return ResponseEntity.ok(responseDTO);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error calling Gemini service: " + e.getMessage());
         }
