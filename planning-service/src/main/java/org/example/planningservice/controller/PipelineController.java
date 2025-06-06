@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/pipeline")
 public class PipelineController {
 
-    private static final Logger log = LoggerFactory.getLogger(org.example.planningservice.controllers.PipelineController.class);
+    private static final Logger log = LoggerFactory.getLogger(org.example.planningservice.controller.PipelineController.class);
     private final PipelineManager<String> pipelineManager;
 
     public PipelineController(PipelineManager<String> pipelineManager) {
