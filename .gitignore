@@ -5,6 +5,7 @@ build/
 gradle/
 bin/
 out/
+KEYCLOAK_QUICK_SETUP.txt
 
 # IntelliJ IDEA
 *.iws

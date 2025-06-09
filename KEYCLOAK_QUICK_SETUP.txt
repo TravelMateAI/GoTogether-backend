@@ -1,0 +1,16 @@
+# Quick Keycloak Setup Commands (for local reference)
+
+# Assumes Docker services (including Keycloak) are running via:
+# cd apigateway/kong
+# docker-compose up -d
+# cd ../..
+
+# Configure Keycloak Admin CLI Access (run from project root):
+docker compose -f apigateway/kong/docker-compose.yml exec keycloak /opt/keycloak/bin/kcadm.sh config credentials --server http://localhost:8081 --realm master --user admin --password admin
+
+# Set SSL Required to None for master realm (for local development - run from project root):
+docker compose -f apigateway/kong/docker-compose.yml exec keycloak /opt/keycloak/bin/kcadm.sh update realms/master -s sslRequired=NONE
+
+# Access Keycloak Admin Console:
+# http://localhost:8081/admin/
+# (Default admin/admin, or as configured)
