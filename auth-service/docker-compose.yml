@@ -1,9 +1,52 @@
 version: "3"
 
+x-kong-config: &kong-env
+  KONG_DATABASE: ${KONG_DATABASE:-postgres}
+  KONG_PG_DATABASE: ${KONG_PG_DATABASE:-kong}
+  KONG_PG_HOST: kong-database
+  KONG_PG_USER: ${KONG_PG_USER:-kong}
+  KONG_PG_PASSWORD: mykongpassword
+
+volumes:
+  keycloak_db: {}
+  kong_data: {}
+  kong_prefix_vol:
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+  kong_tmp_vol:
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+
+networks:
+  kong-net:
+    external: false
+    ipam:
+      config:
+        - subnet: 172.1.1.0/24
+
 services:
   ################################################
   #                   Keycloak                   #
   ################################################
+  # keycloak-db:
+  #   image: postgres:16-alpine
+  #   environment:
+  #     POSTGRES_DB: keycloak
+  #     POSTGRES_USER: keycloak
+  #     POSTGRES_PASSWORD: mykeycloakpassword
+  #   volumes:
+  #     - keycloak_db:/var/lib/postgresql/data
+  #   networks:
+  #     - kong-net
+  #   healthcheck:
+  #     test: ["CMD", "pg_isready", "-d", "keycloak", "-U", "keycloak"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
+  #   restart: unless-stopped
+
   keycloak:
     build:
       context: .
@@ -13,6 +56,9 @@ services:
       - --http-enabled=true
       - --hostname-strict=false
       - --hostname-strict-https=false
+      # - import
+      # - --import-realm
+      # - --import-path=/opt/keycloak/data/import
     environment:
       KC_DB: postgres
       KC_DB_URL: "jdbc:postgresql://aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=require&connectTimeout=10"
@@ -29,4 +75,98 @@ services:
     ports:
       - "8445:8443"
       - "8081:8080"
+    # depends_on:
+    #   keycloak-db:
+    #     condition: service_healthy
     restart: unless-stopped
+  ################################################
+  # Kong components (Kong & PostgreSQL Database) #
+  ################################################
+
+  # kong-migrations:
+  #   image: custom/kong-oidc:latest
+  #   # image: kong:3.5
+  #   command: kong migrations bootstrap
+  #   environment:
+  #     <<: *kong-env
+  #   networks:
+  #     - kong-net
+  #   restart: on-failure
+  #   depends_on:
+  #     - kong-database
+
+  # kong-migrations-up:
+  #   image: kong:3.5
+  #   command: kong migrations up && kong migrations finish
+  #   environment:
+  #     <<: *kong-env
+  #   networks:
+  #     - kong-net
+  #   restart: on-failure
+  #   depends_on:
+  #     - kong-database
+
+  # kong:
+  #   image: custom/kong-oidc:latest
+  #   # image: kong:3.5
+  #   user: "${KONG_USER:-kong}"
+  #   environment:
+  #     <<: *kong-env
+  #     KONG_ADMIN_ACCESS_LOG: /dev/stdout
+  #     KONG_ADMIN_ERROR_LOG: /dev/stderr
+  #     KONG_PROXY_LISTEN: "${KONG_PROXY_LISTEN:-0.0.0.0:8000, 0.0.0.0:8443 ssl}"
+  #     KONG_ADMIN_LISTEN: "${KONG_ADMIN_LISTEN:-0.0.0.0:8001}"
+  #     KONG_ADMIN_GUI_LISTEN: "${KONG_ADMIN_GUI_LISTEN:-0.0.0.0:8002}"
+  #     KONG_PROXY_ACCESS_LOG: /dev/stdout
+  #     KONG_PROXY_ERROR_LOG: /dev/stderr
+  #     KONG_PREFIX: ${KONG_PREFIX:-/var/run/kong}
+  #     KONG_TRACING_INSTRUMENTATIONS: "request"
+  #     KONG_CONF: /etc/kong/kong.conf
+
+  #   networks:
+  #     - kong-net
+  #   ports:
+  #     - "${KONG_INBOUND_PROXY_LISTEN:-0.0.0.0}:8000:8000/tcp"
+  #     - "${KONG_INBOUND_SSL_PROXY_LISTEN:-0.0.0.0}:8443:8443/tcp"
+  #     - "127.0.0.1:8001:8001/tcp"
+  #     - "127.0.0.1:8444:8444/tcp"
+  #     - "127.0.0.1:8002:8002/tcp"
+  #   healthcheck:
+  #     test: [ "CMD", "kong", "health" ]
+  #     interval: 10s
+  #     timeout: 10s
+  #     retries: 10
+  #   restart: on-failure:5
+  #   read_only: true
+  #   volumes:
+  #     - kong_prefix_vol:${KONG_PREFIX:-/var/run/kong}
+  #     - kong_tmp_vol:/tmp
+  #   security_opt:
+  #     - no-new-privileges
+
+  # kong-database:
+  #   image: postgres:16-alpine
+  #   environment:
+  #     POSTGRES_DB: ${KONG_PG_DATABASE:-kong}
+  #     POSTGRES_USER: ${KONG_PG_USER:-kong}
+  #     POSTGRES_PASSWORD: ${KONG_PG_PASSWORD:-mykongpassword}
+  #   healthcheck:
+  #     test:
+  #       [
+  #         "CMD",
+  #         "pg_isready",
+  #         "-d",
+  #         "${KONG_PG_DATABASE:-kong}",
+  #         "-U",
+  #         "${KONG_PG_USER:-kong}"
+  #       ]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #   restart: unless-stopped
+  #   stdin_open: true
+  #   tty: true
+  #   networks:
+  #     - kong-net
+  #   volumes:
+  #     - kong_data:/var/lib/postgresql/data

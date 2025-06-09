@@ -93,8 +93,8 @@ services:
 
   auth-service:
     build:
-      context: ../auth-service
-      dockerfile: Dockerfile.keycloak
+      context: .
+      dockerfile: ../auth-service/Dockerfile.keycloak
     command:
       - start-dev
       - --http-enabled=true
