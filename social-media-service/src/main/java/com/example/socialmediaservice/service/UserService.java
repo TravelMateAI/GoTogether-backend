@@ -28,7 +28,7 @@ public class UserService {
     private final UserRepo userRepository;
     private final WebClient.Builder webClientBuilder;
 
-    private final String keycloakUrl = "http://localhost:8081";
+    private final String keycloakUrl = "http://auth-service:8080";
     private final String adminUsername = "admin";
     private final String adminPassword = "admin";
 

@@ -148,6 +148,8 @@ services:
     ports:
       - "8083:8000"
       - "50051:50051"
+    env_file:
+      - ../api-service/.env
     environment:
       - GIN_MODE=release
     networks:
