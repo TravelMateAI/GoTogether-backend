@@ -6,9 +6,10 @@ COMPOSE_FILE="deploy/docker-compose.yml"
 
 SERVICES=(
   "api-gateway"
-  "plannig-service"
-  "social-media-service"
-  "auth-service"
+  # "planning-service"
+  # "social-media-service"
+  # "auth-service"
+  # "api-service"
 )
 
 
@@ -79,8 +80,11 @@ if $BUILD; then
     if [ -f "$svc/pom.xml" ]; then
       echo "📦 Running Maven build for $svc..."
       (cd "$svc" && mvn clean package -DskipTests)
+    elif [ -f "$svc/build.gradle" ]; then
+      echo "📦 Running Gradle build for $svc..."
+      (cd "$svc" && ./gradlew bootJar --no-daemon)
     else
-      echo "ℹ️  Skipping Maven build for $svc (no pom.xml)"
+      echo "ℹ️ Skipping Maven/Gradle build for $svc (no pom.xml or build.gradle)" 
     fi
 
     echo "🐳 Building Docker image for $svc..."
