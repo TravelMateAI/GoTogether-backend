@@ -1,9 +1,11 @@
-x-kong-config: &kong-env
-  KONG_DATABASE: ${KONG_DATABASE:-postgres}
-  KONG_PG_DATABASE: ${KONG_PG_DATABASE:-kong}
+version: "3"
+
+x-kong-env: &kong-env
+  KONG_DATABASE: postgres
+  KONG_PG_DATABASE: kong
   KONG_PG_HOST: kong-database
-  KONG_PG_USER: ${KONG_PG_USER:-kong}
-  KONG_PG_PASSWORD: mykongpassword
+  KONG_PG_USER: kong
+  KONG_PG_PASSWORD: kong
 
 volumes:
   kong_data: {}
@@ -12,48 +14,38 @@ volumes:
       type: tmpfs
       device: tmpfs
   kong_tmp_vol:
+    driver: local
     driver_opts:
       type: tmpfs
       device: tmpfs
+  keycloak_data: {}
 
 networks:
   kong-net:
     ipam:
       config:
-        - subnet: 172.1.1.0/24
+        - subnet: 172.30.0.0/16
 
 services:
-  # Services from api-gateway/docker-compose.yml
   kong-database:
     image: postgres:16-alpine
     environment:
-      POSTGRES_DB: ${KONG_PG_DATABASE:-kong}
-      POSTGRES_USER: ${KONG_PG_USER:-kong}
-      POSTGRES_PASSWORD: ${KONG_PG_PASSWORD:-mykongpassword}
+      POSTGRES_DB: kong
+      POSTGRES_USER: kong
+      POSTGRES_PASSWORD: kong
     volumes:
       - kong_data:/var/lib/postgresql/data
     networks:
       - kong-net
     healthcheck:
-      test:
-        [
-          "CMD",
-          "pg_isready",
-          "-d",
-          "${KONG_PG_DATABASE:-kong}",
-          "-U",
-          "${KONG_PG_USER:-kong}",
-        ]
+      test: ["CMD", "pg_isready", "-d", "kong", "-U", "kong"]
       interval: 30s
       timeout: 10s
       retries: 3
     restart: unless-stopped
 
   kong-migrations:
-    build:
-      context: ../api-gateway
-      dockerfile: Dockerfile.kong-oidc
-    image: custom/kong-oidc:latest # Image name should match what the build produces
+    image: kong:3.5
     command: kong migrations bootstrap
     environment:
       <<: *kong-env
@@ -63,41 +55,24 @@ services:
       - kong-database
     restart: on-failure
 
-  kong-migrations-up:
-    image: kong:3.5 # Standard image, no build needed
-    command: /bin/sh -c "kong migrations up && kong migrations finish"
-    environment:
-      <<: *kong-env
-    networks:
-      - kong-net
-    depends_on:
-      - kong-database
-    restart: on-failure
-
-  api-gateway: # Renamed from 'kong'
-    build:
-      context: ../api-gateway
-      dockerfile: Dockerfile.kong-oidc
-    image: custom/kong-oidc:latest # Image name should match what the build produces
-    user: "${KONG_USER:-kong}"
+  api-gateway:
+    image: kong:3.5
+    user: kong
     environment:
       <<: *kong-env
       KONG_ADMIN_ACCESS_LOG: /dev/stdout
       KONG_ADMIN_ERROR_LOG: /dev/stderr
-      KONG_PROXY_LISTEN: "${KONG_PROXY_LISTEN:-0.0.0.0:8000, 0.0.0.0:8443 ssl}"
-      KONG_ADMIN_LISTEN: "${KONG_ADMIN_LISTEN:-0.0.0.0:8001}"
-      KONG_ADMIN_GUI_LISTEN: "${KONG_ADMIN_GUI_LISTEN:-0.0.0.0:8002}"
+      KONG_PROXY_LISTEN: 0.0.0.0:8000, 0.0.0.0:8443 ssl
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
       KONG_PROXY_ACCESS_LOG: /dev/stdout
       KONG_PROXY_ERROR_LOG: /dev/stderr
-      KONG_PREFIX: ${KONG_PREFIX:-/var/run/kong}
-      KONG_TRACING_INSTRUMENTATIONS: "request"
-      KONG_CONF: /etc/kong/kong.conf
+      KONG_PREFIX: /var/run/kong
+      KONG_TRACING_INSTRUMENTATIONS: request
     ports:
-      - "${KONG_INBOUND_PROXY_LISTEN:-0.0.0.0}:8000:8000" # api-service also uses 8000, this might need adjustment if KONG_INBOUND_PROXY_LISTEN is not set to a different host IP. For now, keeping as is from source.
-      - "${KONG_INBOUND_SSL_PROXY_LISTEN:-0.0.0.0}:8443:8443"
-      - "127.0.0.1:8001:8001"
-      - "127.0.0.1:8444:8444"
-      - "127.0.0.1:8002:8002"
+      - "8000:8000"
+      - "8443:8443"
+      - "8001:8001"
+      - "8444:8444"
     networks:
       - kong-net
     healthcheck:
@@ -108,15 +83,17 @@ services:
     restart: on-failure
     read_only: true
     volumes:
-      - kong_prefix_vol:${KONG_PREFIX:-/var/run/kong}
+      - kong_prefix_vol:/var/run/kong
       - kong_tmp_vol:/tmp
     security_opt:
       - no-new-privileges
+    depends_on:
+      - kong-database
+      - kong-migrations
 
-  # Service from auth-service/docker-compose.yml
-  auth-service: # Renamed from 'keycloak'
+  auth-service:
     build:
-      context: ../auth-service # Adjusted context
+      context: ../auth-service
       dockerfile: Dockerfile.keycloak
     command:
       - start-dev
@@ -130,28 +107,24 @@ services:
       KC_DB_PASSWORD: Postgres@2025
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
-      KC_HOSTNAME_URL: http://localhost:8084 # Adjusted to match the new host port mapping
+      KC_HOSTNAME_URL: http://localhost:8084
       KEYCLOAK_IMPORT: /opt/keycloak/data/import/kong-realm.json
     volumes:
-      - ../auth-service/keycloak-import:/opt/keycloak/data/import # Adjusted volume path
+      - ../auth-service/keycloak-import:/opt/keycloak/data/import
+      - keycloak_data:/opt/keycloak/data
     networks:
       - kong-net
     ports:
-      # Original Keycloak internal HTTP is 8080, HTTPS is 8443.
-      # Original mapping was 8081:8080 and 8445:8443
-      # planning-service now uses host 8081.
-      # Let's map auth-service to host 8084 (for HTTP) and 8446 (for HTTPS)
       - "8084:8080"
       - "8446:8443"
     restart: unless-stopped
 
-  # Existing services from deploy/docker-compose.yml, now with kong-net
   planning-service:
     build:
       context: ../planning-service
       dockerfile: ../deploy/Dockerfile.springboot
     ports:
-      - "8081:8081"
+      - "8086:8081"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
@@ -173,10 +146,7 @@ services:
       context: ../api-service
       dockerfile: Dockerfile
     ports:
-      - "8000:8000" # This conflicts with api-gateway's 8000:8000. Kong should be the entry point.
-        # I will change api-service to map to a different host port, e.g. 8083 (as it was before)
-        # and its internal port 8000 will be accessible within kong-net.
-      - "8083:8000" # Host:Container
+      - "8083:8000"
       - "50051:50051"
     environment:
       - GIN_MODE=release

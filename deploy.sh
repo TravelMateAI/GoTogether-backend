@@ -6,10 +6,10 @@ COMPOSE_FILE="deploy/docker-compose.yml"
 
 SERVICES=(
   "api-gateway"
-  # "planning-service"
-  # "social-media-service"
-  # "auth-service"
-  # "api-service"
+  "planning-service"
+  "social-media-service"
+  "auth-service"
+  "api-service"
 )
 
 
