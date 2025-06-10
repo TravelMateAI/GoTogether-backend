@@ -140,7 +140,7 @@ public class AuthService {
                     newUser.setFirstName(oauth2User.getAttribute("given_name"));
                     newUser.setLastName(oauth2User.getAttribute("family_name"));
                     newUser.setAvatarUrl(oauth2User.getAttribute("picture"));
-                    newUser.setEnabled(true);
+//                    newUser.setEnabled(true);
                     return userRepository.save(newUser);
                 });
 
