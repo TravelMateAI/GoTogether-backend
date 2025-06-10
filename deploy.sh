@@ -180,15 +180,16 @@ if $BUILD; then
       log_message "ℹ️ Skipping Maven/Gradle build for $svc (no pom.xml or build.gradle)" "$YELLOW"
     fi
 
-    local build_cmd="docker-compose -f "$COMPOSE_FILE" build"
+    build_cmd_array=() # Declare as a regular array
+    build_cmd_array+=("docker-compose" "-f" "$COMPOSE_FILE" "build")
     if $FORCE_REBUILD; then
-      build_cmd="$build_cmd --no-cache"
+      build_cmd_array+=("--no-cache")
       log_message "ℹ️ Force rebuild enabled for $svc (using --no-cache)." "$YELLOW"
     fi
-    build_cmd="$build_cmd "$svc""
+    build_cmd_array+=("$svc")
 
-    # Run the build command (potentially with --no-cache)
-    (eval $build_cmd) & # Use eval to correctly process the command string with quotes
+    # Run the build command
+    ("${build_cmd_array[@]}") &
     spinner $! "🐳 Building Docker image for $svc"
     if [ $? -ne 0 ]; then
         # Spinner already prints FAIL, this adds more context and exits
@@ -212,10 +213,10 @@ if $RUN; then
   log_message "Exposed Port Mappings:" "$BLUE"
   echo "$SECTION_SEPARATOR"
 
-  local service_ports_info=""
-  local current_service=""
-  local in_service_block=false
-  local in_ports_block=false
+  service_ports_info=""
+  # current_service="" # Removed as unused
+  in_service_block=false
+  in_ports_block=false
 
   for svc_name in "${TARGET_SERVICES[@]}"; do
       service_ports_info=""
