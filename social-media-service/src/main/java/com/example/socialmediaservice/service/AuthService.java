@@ -4,6 +4,7 @@ import com.example.socialmediaservice.entity.User;
 import com.example.socialmediaservice.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -23,11 +24,17 @@ import java.util.UUID;
 @Slf4j
 public class AuthService {
 
+    @Value("${keycloak.server-url}")
+    private String keycloakServerUrl;
+
+    @Value("${keycloak.client-secret}")
+    private String keycloakClientSecret;
+
     private final UserService userService; // To interact with user data for non-auth specific lookups
     private final UserRepo userRepository; // For direct DB access for auth-related user processing
     private final WebClient.Builder webClientBuilder;
 
-    private final String keycloakUrl = "http://localhost:8081"; // Placeholder, ideally from config
+    // private final String keycloakUrl = "http://localhost:8081"; // Placeholder, ideally from config
 
     @lombok.Data
     public static class TokenResponse {
@@ -55,13 +62,13 @@ public class AuthService {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("grant_type", "password");
         formData.add("client_id", "kong-oidc");
-        formData.add("client_secret", "fBHJFdikM0ERtTXnvebguHRz6iPUfJfV"); // Move to env or config!
+        formData.add("client_secret", keycloakClientSecret); // Move to env or config!
         formData.add("username", username);
         formData.add("password", password);
         formData.add("scope", "openid profile email offline_access");
 
         AuthService.TokenResponse tokenResponse = webClient.post()
-                .uri(keycloakUrl + "/realms/kong/protocol/openid-connect/token")
+                .uri(keycloakServerUrl + "/protocol/openid-connect/token")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .bodyValue(formData)
                 .retrieve()
@@ -88,12 +95,12 @@ public class AuthService {
         formData.add("grant_type", "refresh_token");
         formData.add("refresh_token", refreshToken);
         formData.add("client_id", "kong-oidc");
-        formData.add("client_secret", "fBHJFdikM0ERtTXnvebguHRz6iPUfJfV");
+        formData.add("client_secret", keycloakClientSecret);
 
         log.info("Attempting to refresh access token using refresh token (first 10 chars): {}", refreshToken.substring(0, Math.min(refreshToken.length(), 10)));
 
         AuthService.TokenResponse tokenResponse = webClient.post()
-                .uri(keycloakUrl + "/realms/kong/protocol/openid-connect/token")
+                .uri(keycloakServerUrl + "/protocol/openid-connect/token")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .bodyValue(formData)
                 .retrieve()
@@ -164,7 +171,7 @@ public class AuthService {
     public User getUserByEmailFromToken(String accessToken) {
         WebClient webClient = webClientBuilder.build();
         Map<String, Object> userInfo = webClient.get()
-                .uri(keycloakUrl + "/realms/kong/protocol/openid-connect/userinfo")
+                .uri(keycloakServerUrl + "/protocol/openid-connect/userinfo")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
