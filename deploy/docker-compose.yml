@@ -74,11 +74,6 @@ services:
       - "8444:8444"
     networks:
       - kong-net
-    healthcheck:
-      test: ["CMD", "kong", "health"]
-      interval: 10s
-      timeout: 10s
-      retries: 10
     restart: on-failure
     read_only: true
     volumes:
@@ -96,11 +91,14 @@ services:
     build:
       context: .
       dockerfile: ../auth-service/Dockerfile.keycloak
-#    command:
-#      - start-dev
-#      - --http-enabled=true
-#      - --hostname-strict=false
-#      - --hostname-strict-https=false
+    command:
+      - start-dev
+      - --http-enabled=true
+      - --http-host=0.0.0.0
+      - --hostname-strict=false
+      - --hostname-strict-https=false
+      - --hostname=auth-service
+      - --http-port=8080
     environment:
       KC_DB: postgres
       KC_DB_URL: "jdbc:postgresql://aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=require&connectTimeout=10"
@@ -108,7 +106,8 @@ services:
       KC_DB_PASSWORD: Postgres@2025
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
-      KC_HOSTNAME_URL: http://localhost:8084
+      # KC_HOSTNAME_URL: http://localhost:8084
+      KC_HOSTNAME_URL: http://auth-service:8080
       KEYCLOAK_IMPORT: /opt/keycloak/data/import/kong-realm.json
     volumes:
       - ../auth-service/keycloak-import:/opt/keycloak/data/import
@@ -118,13 +117,6 @@ services:
     ports:
       - "8084:8080"
       - "8446:8443"
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8080/realms/kong || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 120s
-    restart: unless-stopped
 
   planning-service:
     build:
@@ -136,32 +128,33 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
       - kong-net
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8081/actuator/health || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
 
   social-media-service:
     build:
       context: ../social-media-service
-      dockerfile: ../deploy/Dockerfile.springboot
+      # dockerfile:  ../social-media-service/Dockerfile
     ports:
       - "8080:8080"
+    env_file:
+      - ../social-media-service/.env
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
       - kong-net
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
     depends_on:
-      auth-service:
-        condition: service_healthy
+      - auth-service
+      # auth-service:
+      #   condition: service_healthy
+    command: >
+      sh -c "
+      echo 'Waiting for Keycloak to be ready...' &&
+      until curl -sSf http://auth-service:8080/realms/kong/.well-known/openid-configuration; do
+        echo 'Waiting for realm kong...';
+        sleep 5;
+      done &&
+      echo 'Keycloak realm is ready. Starting app...' &&
+      java -jar /app/social-media-service.jar
+      "
 
   api-service:
     build:
@@ -176,9 +169,3 @@ services:
       - GIN_MODE=release
     networks:
       - kong-net
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8000/healthz || exit 1"]
-      interval: 20s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
