@@ -5,19 +5,10 @@
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/planning-service" />
-        <option name="gradleJvm" value="openjdk-23" />
+        <option name="gradleJvm" value="17" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/planning-service" />
-          </set>
-        </option>
-      </GradleProjectSettings>
-      <GradleProjectSettings>
-        <option name="externalProjectPath" value="$PROJECT_DIR$/social-media-service" />
-        <option name="gradleJvm" value="openjdk-23" />
-        <option name="modules">
-          <set>
-            <option value="$PROJECT_DIR$/social-media-service" />
           </set>
         </option>
       </GradleProjectSettings>
