@@ -1,9 +1,8 @@
 package org.example.planningservice.controllers;
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.planningservice.pipelines.PipelineManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.example.planningservice.pipelines.planning.PlanningPipe;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,19 +13,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/pipeline")
 public class PipelineController {
 
-    private static final Logger log = LoggerFactory.getLogger(PipelineController.class);
-    private final PipelineManager<String> pipelineManager;
-
-    public PipelineController(PipelineManager<String> pipelineManager) {
-        this.pipelineManager = pipelineManager;
-    }
+    @Autowired
+    private PlanningPipe planningPipe;
 
     @PostMapping("/execute")
     public String executePipeline(@RequestBody String input) {
 
-        log.info("🚀 Starting Pipeline...");
-        String result = pipelineManager.execute(input);
-        log.info("🎉 Final Output: " + result);
+        log.info("🚀 Starting Pipeline...\n");
+        String result = planningPipe.execute(input);
+        log.info("\n🎉 Final Output: " + result);
 
         return result;
     }

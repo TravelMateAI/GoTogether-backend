@@ -4,16 +4,283 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f00682f8-b202-49d8-bafb-a58bfd993ef3" name="Changes" comment="">
+    <list default="true" id="f00682f8-b202-49d8-bafb-a58bfd993ef3" name="Changes" comment="Merge branch 'dev' into dev_planning_kavindu_initiatePipelines&#10;&#10;# Conflicts:&#10;#&#9;.idea/gradle.xml&#10;#&#9;.idea/misc.xml&#10;#&#9;.idea/modules.xml&#10;#&#9;planning-service/src/main/java/org/example/planningservice/controllers/PipelineController.java">
+      <change afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/dataSources/1d7d931b-4a53-4a75-8fda-59484c44f07d.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/dataSources/1d7d931b-4a53-4a75-8fda-59484c44f07d/storage_v2/_src_/database/postgres.edMnLQ.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/dataSources/1d7d931b-4a53-4a75-8fda-59484c44f07d/storage_v2/_src_/database/postgres.edMnLQ/schema/information_schema.FNRwLQ.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/dataSources/1d7d931b-4a53-4a75-8fda-59484c44f07d/storage_v2/_src_/database/postgres.edMnLQ/schema/pg_catalog.0S1ZNQ.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/dataSources/1d7d931b-4a53-4a75-8fda-59484c44f07d/storage_v2/_src_/database/postgres.edMnLQ/schema/public.abK9xQ.meta" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/.idea/libraries/gradle_wrapper.xml" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/.idea/libraries/gradle_wrapper2.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules/planning-service.main.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules/planning-service.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules/planning-service.test.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api-service/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api-service/config/config.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api-service/controllers/gemini_controller.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api-service/controllers/maps_controller.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api-service/go.mod" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api-service/go.sum" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api-service/main.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api-service/models/geocode_model.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api-service/models/places_model.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api-service/routes/routes.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api-service/services/gemini/gemini.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api-service/services/maps/directions_service.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api-service/services/maps/distance_matrix_service.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api-service/services/maps/geocode_service.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api-service/services/maps/maps_client.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api-service/services/maps/places_service.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apigateway/kong/keycloak-import/kong-realm.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/.gradle/8.12/checksums/checksums.lock" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/.gradle/8.12/checksums/md5-checksums.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/.gradle/8.12/checksums/sha1-checksums.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/.gradle/8.12/executionHistory/executionHistory.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/.gradle/8.12/executionHistory/executionHistory.lock" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/.gradle/8.12/expanded/expanded.lock" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/.gradle/8.12/fileChanges/last-build.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/.gradle/8.12/fileHashes/fileHashes.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/.gradle/8.12/fileHashes/fileHashes.lock" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/.gradle/8.12/fileHashes/resourceHashesCache.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/.gradle/8.12/gc.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/.gradle/buildOutputCleanup/cache.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/.gradle/buildOutputCleanup/outputFiles.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/.gradle/file-system.probe" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/.gradle/vcs-1/gc.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/.idea/compiler.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/.idea/gradle.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/application.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/SocialMediaServiceApplication.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/controller/MediaController.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/controller/PostController.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/controller/PostInteractionController.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/controller/UserController$AvatarUpdateRequest.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/controller/UserController$RegisterRequest.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/controller/UserController.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/dto/CommentDTO.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/dto/CreatePostRequestDTO.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/dto/CreatePostResponseDTO.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/dto/FollowerInfo.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/dto/MediaCreateRequestDTO.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/dto/MediaDTO.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/dto/PostDTO$CountDTO.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/dto/PostDTO$UserIdDTO.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/dto/PostDTO.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/dto/PostsPageDTO.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/dto/ReactionDTO.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/dto/ReplyCommentRequestDTO.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/dto/RequestCommentDTO.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/dto/UpdatePostRequestDTO.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/dto/UpdateProfileRequest.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/dto/UpdateProfileResponse.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/dto/UserDTO.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/dto/UserProfileDTO.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/entity/Bookmark.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/entity/Comment.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/entity/Media.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/entity/Post.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/entity/Reaction.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/entity/User.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/enums/MediaType.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/enums/ReactionType.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/mapper/CommentMapper.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/mapper/PostMapper.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/repository/BookmarkRepository.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/repository/CommentRepo.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/repository/MediaRepo.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/repository/PostRepo.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/repository/ReactionRepo.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/repository/UserRepo.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/service/BookmarkService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/service/CommentService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/service/MediaService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/service/PostService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/service/ReactionService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/service/UserService$KeycloakUserRequest$Credential.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/service/UserService$KeycloakUserRequest.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/service/UserService$TokenResponse.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/main/com/example/socialmediaservice/service/UserService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/bin/test/com/example/socialmediaservice/SocialMediaServiceApplicationTests.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/SocialMediaServiceApplication.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/controller/MediaController.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/controller/PostController.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/controller/PostInteractionController.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/controller/UserController$AvatarUpdateRequest.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/controller/UserController$RegisterRequest.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/controller/UserController.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/dto/CommentDTO.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/dto/CreatePostRequestDTO.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/dto/CreatePostResponseDTO.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/dto/FollowerInfo.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/dto/MediaCreateRequestDTO.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/dto/MediaDTO.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/dto/PostDTO$CountDTO.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/dto/PostDTO$UserIdDTO.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/dto/PostDTO.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/dto/PostsPageDTO.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/dto/ReactionDTO.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/dto/ReplyCommentRequestDTO.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/dto/RequestCommentDTO.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/dto/UpdatePostRequestDTO.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/dto/UpdateProfileRequest.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/dto/UpdateProfileResponse.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/dto/UserDTO.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/dto/UserProfileDTO.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/entity/Bookmark.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/entity/Comment.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/entity/Media.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/entity/Post.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/entity/Reaction.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/entity/User.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/enums/MediaType.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/enums/ReactionType.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/mapper/CommentMapper.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/mapper/PostMapper.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/repository/BookmarkRepository.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/repository/CommentRepo.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/repository/MediaRepo.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/repository/PostRepo.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/repository/ReactionRepo.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/repository/UserRepo.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/service/BookmarkService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/service/CommentService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/service/MediaService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/service/PostService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/service/ReactionService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/service/UserService$KeycloakUserRequest$Credential.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/service/UserService$KeycloakUserRequest.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/service/UserService$TokenResponse.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/classes/java/main/com/example/socialmediaservice/service/UserService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/api/annotations.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/api/auth.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/api/backend.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/api/billing.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/api/client.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/api/config_change.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/api/consumer.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/api/context.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/api/control.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/api/distribution.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/api/documentation.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/api/endpoint.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/api/error_reason.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/api/field_behavior.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/api/http.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/api/httpbody.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/api/label.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/api/launch_stage.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/api/log.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/api/logging.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/api/metric.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/api/monitored_resource.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/api/monitoring.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/api/quota.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/api/resource.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/api/routing.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/api/service.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/api/source_info.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/api/system_parameter.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/api/usage.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/api/visibility.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/cloud/audit/audit_log.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/cloud/extended_operations.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/geo/type/viewport.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/logging/type/http_request.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/logging/type/log_severity.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/longrunning/operations.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/protobuf/any.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/protobuf/api.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/protobuf/compiler/plugin.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/protobuf/descriptor.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/protobuf/duration.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/protobuf/empty.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/protobuf/field_mask.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/protobuf/source_context.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/protobuf/struct.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/protobuf/timestamp.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/protobuf/type.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/protobuf/wrappers.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/rpc/code.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/rpc/context/attribute_context.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/rpc/error_details.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/rpc/status.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/type/calendar_period.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/type/color.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/type/date.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/type/datetime.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/type/dayofweek.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/type/decimal.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/type/expr.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/type/fraction.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/type/interval.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/type/latlng.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/type/localized_text.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/type/money.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/type/month.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/type/phone_number.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/type/postal_address.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/type/quaternion.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/extracted-include-protos/main/google/type/timeofday.proto" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/reports/problems/problems-report.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/resources/main/application.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/tmp/compileJava/compileTransaction/stash-dir/UserController$AvatarUpdateRequest.class.uniqueId3" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/tmp/compileJava/compileTransaction/stash-dir/UserController$RegisterRequest.class.uniqueId4" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/tmp/compileJava/compileTransaction/stash-dir/UserController.class.uniqueId1" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/tmp/compileJava/compileTransaction/stash-dir/UserService$KeycloakUserRequest$Credential.class.uniqueId6" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/tmp/compileJava/compileTransaction/stash-dir/UserService$KeycloakUserRequest.class.uniqueId5" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/tmp/compileJava/compileTransaction/stash-dir/UserService$TokenResponse.class.uniqueId2" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/tmp/compileJava/compileTransaction/stash-dir/UserService.class.uniqueId0" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/build/tmp/compileJava/previous-compilation-data.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/gradle/wrapper/gradle-wrapper.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/gradlew" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/gradlew.bat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/config/CorsConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/controller/MediaController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/dto/CreatePostResponseDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/dto/FollowerInfo.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/dto/MediaCreateRequestDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/dto/MediaDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/dto/RequestCommentDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/dto/UpdateProfileRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/dto/UpdateProfileResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/dto/UserDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/entity/Bookmark.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/entity/Media.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/enums/MediaType.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/repository/BookmarkRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/repository/MediaRepo.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/service/BookmarkService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/service/MediaService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planning-service/src/main/java/org/example/planningservice/controllers/PipelineController.java" beforeDir="false" afterPath="$PROJECT_DIR$/planning-service/src/main/java/org/example/planningservice/controllers/PipelineController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apigateway/kong/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/apigateway/kong/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/controller/PostController.java" beforeDir="false" afterPath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/controller/PostController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/controller/PostInteractionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/controller/PostInteractionController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/controller/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/dto/CommentDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/dto/CommentDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/dto/CreatePostRequestDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/dto/CreatePostRequestDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/dto/PostDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/dto/PostDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/dto/UpdatePostRequestDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/dto/UpdatePostRequestDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/entity/Post.java" beforeDir="false" afterPath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/entity/Post.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/entity/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/entity/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/mapper/CommentMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/mapper/CommentMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/mapper/PostMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/mapper/PostMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/repository/CommentRepo.java" beforeDir="false" afterPath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/repository/CommentRepo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/repository/UserRepo.java" beforeDir="false" afterPath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/repository/UserRepo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/service/PostService.java" beforeDir="false" afterPath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/service/PostService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/service/ReactionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/service/ReactionService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/social-media-service/src/main/java/com/example/socialmediaservice/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/social-media-service/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/social-media-service/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,6 +301,17 @@
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
                 <item name="planning-service" type="f1a62948:ProjectNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="planning-service" type="f1a62948:ProjectNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="planning-service" type="f1a62948:ProjectNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+                <item name="build" type="c8890929:TasksNode$1" />
               </path>
             </expand>
             <select />
@@ -66,7 +344,8 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "dev",
+    "git-widget-placeholder": "Merging dev__planning__kavindu__initiatePipelines",
+    "node.js.selected.package.tslint": "(autodetect)",
     "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2",
@@ -81,24 +360,13 @@
     </option>
   </component>
   <component name="RunManager">
-    <configuration name="PlanningServiceApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="org.example.planningservice.PlanningServiceApplication" />
+    <configuration name="PlanningServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <module name="planning-service.main" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="org.example.planningservice.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
+      <option name="SPRING_BOOT_MAIN_CLASS" value="org.example.planningservice.PlanningServiceApplication" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Application.PlanningServiceApplication" />
-      </list>
-    </recent_temporary>
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
