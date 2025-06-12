@@ -1,14 +1,12 @@
-package org.example.planningservice.pipelines.steps;
+package org.example.planningservice.pipelines.planning.blocks;
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.planningservice.pipelines.PipelineStep;
-import org.springframework.core.annotation.Order;
+import org.example.planningservice.frameworks.pipeline.Block;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@Order(1)
-public class ValidationStep implements PipelineStep<String> {
+public class ValidationBlock implements Block<String, String> {
 
     @Override
     public String process(String input) {
