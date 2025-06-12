@@ -47,7 +47,7 @@ SERVICES=(
   "api-gateway"
   "api-service"
   "planning-service"
-  "social-media-service"
+   "social-media-service"
 )
 
 
