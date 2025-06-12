@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package route;
+
+// directions.proto
+message RouteRequest {
+  string origin = 1;
+  string destination = 2;
+}
+
+message RouteResponse {
+  string polyline = 1;
+  string distance = 2;
+  string duration = 3;
+}
+
+service DirectionsService {
+  rpc GetRoute(RouteRequest) returns (RouteResponse);
+}

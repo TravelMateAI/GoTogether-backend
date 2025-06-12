@@ -1,0 +1,5 @@
+rootProject.name = 'GoTogether-backend'
+//include 'planning-service'
+//include 'auth-service'
+//include 'api-service'
+//include 'apigateway'
