@@ -27,33 +27,39 @@ jobs:
           OCI_HOST: ${{ secrets.OCI_HOST }}
           OCI_USERNAME: ${{ secrets.OCI_USERNAME }}
           REPO_NAME: ${{ github.repository }}
+          API_ENV_CONTENT: ${{ secrets.API_ENV_CONTENT }}
+          SOCIAL_ENV_CONTENT: ${{ secrets.SOCIAL_ENV_CONTENT }}
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $OCI_USERNAME@$OCI_HOST <<EOF
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $OCI_USERNAME@$OCI_HOST <<'EOF'
             set -e
 
             echo "🔄 Updating packages..."
             sudo dnf update -y
 
-            echo "🐳 Starting Docker if not running..."
+            echo "🐳 Starting Docker..."
             sudo systemctl start docker || true
             sudo systemctl enable docker || true
 
-            echo "🧹 Clearing existing app directory..."
+            echo "🧹 Setting up app directory..."
             APP_DIR="/home/$OCI_USERNAME/app"
             sudo rm -rf "\$APP_DIR"
             mkdir -p "\$APP_DIR"
             cd "\$APP_DIR"
 
-            echo "📥 Cloning repository fresh..."
+            echo "📥 Cloning latest code..."
             git clone --branch dev_oracle https://github.com/$REPO_NAME.git .
 
-            echo "🧹 Stopping any running containers..."
+            echo "🔐 Writing .env files..."
+            echo "$API_ENV_CONTENT" > ./api-service/.env
+            echo "$SOCIAL_ENV_CONTENT" > ./social-media-service/.env
+
+            echo "🛑 Stopping existing containers..."
             docker-compose -f deploy/docker-compose.yml down || true
 
             echo "🚀 Running deploy script..."
             chmod +x ./deploy.sh
             ./deploy.sh --up
 
-            echo "🧼 Cleaning up Docker..."
+            echo "🧼 Docker cleanup..."
             docker system prune -f || true
           EOF
