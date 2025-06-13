@@ -1,10 +1,9 @@
-# .github/workflows/deploy.yml
 name: Deploy to Oracle Cloud VM
 
 on:
   push:
     branches:
-      - dev_oracle # Trigger on dev2 branch
+      - dev_oracle
 
 jobs:
   deploy:
@@ -26,44 +25,35 @@ jobs:
       - name: Deploy to Oracle Cloud Instance
         env:
           OCI_HOST: ${{ secrets.OCI_HOST }}
-          OCI_USERNAME: ${{ secrets.OCI_USERNAME }} # usually "opc"
+          OCI_USERNAME: ${{ secrets.OCI_USERNAME }}
           REPO_NAME: ${{ github.repository }}
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $OCI_USERNAME@$OCI_HOST <<EOF
             set -e
 
+            echo "🔄 Updating packages..."
             sudo dnf update -y
 
-            # Start Docker (if used)
+            echo "🐳 Starting Docker if not running..."
             sudo systemctl start docker || true
             sudo systemctl enable docker || true
 
+            echo "🧹 Clearing existing app directory..."
             APP_DIR="/home/$OCI_USERNAME/app"
+            sudo rm -rf "\$APP_DIR"
             mkdir -p "\$APP_DIR"
             cd "\$APP_DIR"
 
-            if [ ! -d ".git" ]; then
-              echo "Cloning repository for first time..."
-              git clone --branch dev_oracle https://github.com/$REPO_NAME.git .
-            else
-              echo "Pulling latest code from dev_oracle branch..."
-              git pull origin dev_oracle || {
-                echo "Error pulling code, retrying with fresh clone..."
-                rm -rf .git
-                git init
-                git remote add origin https://github.com/$REPO_NAME.git
-                git fetch origin dev_oracle
-                git checkout -b dev_oracle origin/dev_oracle || exit 1
-              }
-            fi
+            echo "📥 Cloning repository fresh..."
+            git clone --branch dev_oracle https://github.com/$REPO_NAME.git .
 
-            echo "Stopping existing containers..."
+            echo "🧹 Stopping any running containers..."
             docker-compose -f deploy/docker-compose.yml down || true
 
-            echo "Running deploy script..."
+            echo "🚀 Running deploy script..."
             chmod +x ./deploy.sh
             ./deploy.sh --up
 
-            echo "Cleaning up unused Docker resources..."
+            echo "🧼 Cleaning up Docker..."
             docker system prune -f || true
           EOF
