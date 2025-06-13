@@ -1,0 +1,76 @@
+# .github/workflows/deploy.yml
+name: Deploy to AWS EC2
+
+on:
+  push:
+    branches:
+      - dev2 # This workflow runs when changes are pushed to the 'deploy' branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest # The type of runner that the job will run on
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4 # Action to check out your repository code
+
+      - name: Configure SSH
+        run: |
+          # Create the .ssh directory if it doesn't exist
+          mkdir -p ~/.ssh
+          # Add the EC2 SSH private key from GitHub Secrets
+          echo "${{ secrets.EC2_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
+          # Set correct permissions for the private key
+          chmod 600 ~/.ssh/id_rsa
+          # Disable strict host key checking to avoid issues with new hosts (for testing, consider adding known_hosts in production)
+          echo "Host *" > ~/.ssh/config
+          echo "  StrictHostKeyChecking no" >> ~/.ssh/config
+          echo "  UserKnownHostsFile /dev/null" >> ~/.ssh/config
+
+      - name: Deploy to EC2
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
+        run: |
+          # Define the application directory on the EC2 instance
+          APP_DIR="/home/${{ env.EC2_USERNAME }}/app" # Adjust this path as needed
+
+          # SSH into the EC2 instance and execute commands
+          ssh -i ~/.ssh/id_rsa ${{ env.EC2_USERNAME }}@${{ env.EC2_HOST }} << 'EOF'
+            # Ensure the application directory exists
+            mkdir -p "${APP_DIR}"
+            
+            # Navigate to the application directory
+            cd "${APP_DIR}"
+
+            # Pull the latest code from the GitHub repository
+            # You might need to configure Git credentials on EC2 if it's a private repo.
+            # For simplicity, ensure the EC2 user has SSH access to GitHub, or use HTTPS with a PAT.
+            # Assuming public repo or SSH key setup on EC2 for GitHub
+            git pull origin deploy
+            if [ $? -ne 0 ]; then
+                echo "Error: Failed to pull latest code. Attempting to clone if it doesn't exist."
+                # If pull fails, try cloning (e.g., first deployment)
+                # You might need to adjust this to your actual repo URL
+                if [ ! -d ".git" ]; then
+                    git clone https://github.com/${{ github.repository }}.git .
+                fi
+                # Re-run pull in case it was a transient error or a new repo
+                git pull origin deploy || { echo "Fatal: Could not get latest code."; exit 1; }
+            fi
+
+            # Stop existing running containers (if any)
+            echo "Stopping existing Docker containers..."
+            docker-compose -f deploy/docker-compose.yml down || true
+
+            # Execute the deployment script
+            # This script will build Docker images and start them
+            echo "Running deployment script on EC2..."
+            # Using the user's provided script
+            ./deploy.sh --up
+
+            echo "Docker containers are up and running!"
+            
+            # Optional: Clean up old Docker images/volumes to save disk space
+            docker system prune -f
+          EOF
