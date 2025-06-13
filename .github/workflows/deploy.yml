@@ -38,7 +38,7 @@ jobs:
             
             # Update & install Git if not present
             sudo yum update -y
-            sudo yum install -y git docker docker-compose
+            
 
             # Start Docker if not running
             sudo systemctl start docker
