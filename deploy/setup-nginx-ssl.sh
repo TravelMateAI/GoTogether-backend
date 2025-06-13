@@ -20,6 +20,17 @@ sudo openssl req -x509 -nodes -days 365 \
 
 echo "📝 Creating NGINX reverse proxy config..."
 sudo tee /etc/nginx/conf.d/backend.conf > /dev/null <<EOF
+# Redirect HTTP to HTTPS
+server {
+    listen 80;
+    server_name 144.24.107.189;
+
+    location / {
+        return 301 https://\$host\$request_uri;
+    }
+}
+
+# HTTPS reverse proxy
 server {
     listen 443 ssl;
     server_name 144.24.107.189;
@@ -43,9 +54,10 @@ EOF
 
 echo "🔓 Allowing HTTPS traffic in firewall..."
 sudo firewall-cmd --add-service=https --permanent
+sudo firewall-cmd --add-service=http --permanent
 sudo firewall-cmd --reload
 
 echo "🔁 Restarting NGINX to apply changes..."
-sudo systemctl restart nginx
+sudo nginx -t && sudo systemctl restart nginx
 
 echo "✅ NGINX with HTTPS reverse proxy is ready on https://144.24.107.189"
