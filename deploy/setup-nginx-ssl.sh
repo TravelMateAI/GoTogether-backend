@@ -14,8 +14,8 @@ sudo mkdir -p /etc/nginx/ssl
 
 sudo openssl req -x509 -nodes -days 365 \
   -newkey rsa:2048 \
-  -keyout /etc/nginx/ssl/selfsigned.key \
-  -out /etc/nginx/ssl/selfsigned.crt \
+  -keyout /etc/nginx/ssl/nginx-selfsigned.key \
+  -out /etc/nginx/ssl/nginx-selfsigned.crt \
   -subj "/C=LK/ST=Western/L=Colombo/O=University/OU=CS/CN=144.24.107.189"
 
 echo "📝 Creating NGINX reverse proxy config..."
@@ -24,20 +24,20 @@ server {
     listen 443 ssl;
     server_name 144.24.107.189;
 
-    ssl_certificate /etc/nginx/ssl/selfsigned.crt;
-    ssl_certificate_key /etc/nginx/ssl/selfsigned.key;
+    ssl_certificate /etc/nginx/ssl/nginx-selfsigned.crt;
+    ssl_certificate_key /etc/nginx/ssl/nginx-selfsigned.key;
 
-    location / {
+    location /api/ {
         proxy_pass http://localhost:8080/;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
     }
-}
 
-server {
-    listen 80;
-    server_name 144.24.107.189;
-    return 301 https://\$host\$request_uri;
+    location / {
+        return 404;
+    }
 }
 EOF
 
