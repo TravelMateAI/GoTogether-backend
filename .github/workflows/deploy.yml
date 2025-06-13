@@ -44,7 +44,7 @@ jobs:
 
             if [ ! -d ".git" ]; then
               echo "Cloning repository for first time..."
-              git clone --branch dev2 https://github.com/$REPO_NAME.git .
+              git clone --branch dev_oracle https://github.com/$REPO_NAME.git .
             else
               echo "Pulling latest code from dev2 branch..."
               git pull origin dev2 || {
