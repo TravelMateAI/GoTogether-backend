@@ -27,50 +27,48 @@ jobs:
           echo "  StrictHostKeyChecking no" >> ~/.ssh/config
           echo "  UserKnownHostsFile /dev/null" >> ~/.ssh/config
 
-      - name: Deploy to EC2
+           - name: Deploy to EC2
         env:
           EC2_HOST: ${{ secrets.EC2_HOST }}
           EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
+          REPO_NAME: ${{ github.repository }}
         run: |
-          # Define the application directory on the EC2 instance
-          APP_DIR="/home/${{ env.EC2_USERNAME }}/app" # Adjust this path as needed
-
-          # SSH into the EC2 instance and execute commands
-          ssh -i ~/.ssh/id_rsa ${{ env.EC2_USERNAME }}@${{ env.EC2_HOST }} << 'EOF'
-            # Ensure the application directory exists
-            mkdir -p "${APP_DIR}"
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $EC2_USERNAME@$EC2_HOST <<EOF
+            set -e  # Stop script on first error
             
-            # Navigate to the application directory
-            cd "${APP_DIR}"
+            # Update & install Git if not present
+            sudo yum update -y
+            sudo yum install -y git docker docker-compose
 
-            # Pull the latest code from the GitHub repository
-            # You might need to configure Git credentials on EC2 if it's a private repo.
-            # For simplicity, ensure the EC2 user has SSH access to GitHub, or use HTTPS with a PAT.
-            # Assuming public repo or SSH key setup on EC2 for GitHub
-            git pull origin deploy
-            if [ $? -ne 0 ]; then
-                echo "Error: Failed to pull latest code. Attempting to clone if it doesn't exist."
-                # If pull fails, try cloning (e.g., first deployment)
-                # You might need to adjust this to your actual repo URL
-                if [ ! -d ".git" ]; then
-                    git clone https://github.com/${{ github.repository }}.git .
-                fi
-                # Re-run pull in case it was a transient error or a new repo
+            # Start Docker if not running
+            sudo systemctl start docker
+            sudo systemctl enable docker
+
+            APP_DIR="/home/$EC2_USERNAME/app"
+            mkdir -p "\$APP_DIR"
+            cd "\$APP_DIR"
+
+            if [ ! -d ".git" ]; then
+              echo "Cloning repository for first time..."
+              git clone https://github.com/$REPO_NAME.git .
+            else
+              echo "Pulling latest code..."
+              git pull origin deploy || {
+                echo "Error pulling code, retrying with fresh clone..."
+                rm -rf .git
+                git init
+                git remote add origin https://github.com/$REPO_NAME.git
                 git pull origin deploy || { echo "Fatal: Could not get latest code."; exit 1; }
+              }
             fi
 
-            # Stop existing running containers (if any)
-            echo "Stopping existing Docker containers..."
+            echo "Stopping running Docker containers..."
             docker-compose -f deploy/docker-compose.yml down || true
 
-            # Execute the deployment script
-            # This script will build Docker images and start them
-            echo "Running deployment script on EC2..."
-            # Using the user's provided script
+            echo "Running deployment script..."
+            chmod +x ./deploy.sh
             ./deploy.sh --up
 
-            echo "Docker containers are up and running!"
-            
-            # Optional: Clean up old Docker images/volumes to save disk space
+            echo "Pruning unused Docker resources..."
             docker system prune -f
           EOF
