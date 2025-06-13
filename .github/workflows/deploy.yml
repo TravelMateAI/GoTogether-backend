@@ -1,50 +1,44 @@
 # .github/workflows/deploy.yml
-name: Deploy to AWS EC2
+name: Deploy to Oracle Cloud VM
 
 on:
   push:
     branches:
-      - dev2 # This workflow runs when changes are pushed to the 'deploy' branch
+      - dev_oracle # Trigger on dev2 branch
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest # The type of runner that the job will run on
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4 # Action to check out your repository code
+        uses: actions/checkout@v4
 
       - name: Configure SSH
         run: |
-          # Create the .ssh directory if it doesn't exist
           mkdir -p ~/.ssh
-          # Add the EC2 SSH private key from GitHub Secrets
-          echo "${{ secrets.EC2_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
-          # Set correct permissions for the private key
+          echo "${{ secrets.OCI_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          # Disable strict host key checking to avoid issues with new hosts (for testing, consider adding known_hosts in production)
           echo "Host *" > ~/.ssh/config
           echo "  StrictHostKeyChecking no" >> ~/.ssh/config
           echo "  UserKnownHostsFile /dev/null" >> ~/.ssh/config
 
-      - name: Deploy to EC2
+      - name: Deploy to Oracle Cloud Instance
         env:
-          EC2_HOST: ${{ secrets.EC2_HOST }}
-          EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
+          OCI_HOST: ${{ secrets.OCI_HOST }}
+          OCI_USERNAME: ${{ secrets.OCI_USERNAME }} # usually "opc"
           REPO_NAME: ${{ github.repository }}
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $EC2_USERNAME@$EC2_HOST <<EOF
-            set -e  # Stop script on first error
-            
-            # Update & install Git if not present
-            sudo yum update -y
-            
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $OCI_USERNAME@$OCI_HOST <<EOF
+            set -e
 
-            # Start Docker if not running
-            sudo systemctl start docker
-            sudo systemctl enable docker
+            sudo dnf update -y
 
-            APP_DIR="/home/$EC2_USERNAME/app"
+            # Start Docker (if used)
+            sudo systemctl start docker || true
+            sudo systemctl enable docker || true
+
+            APP_DIR="/home/$OCI_USERNAME/app"
             mkdir -p "\$APP_DIR"
             cd "\$APP_DIR"
 
@@ -59,18 +53,17 @@ jobs:
                 git init
                 git remote add origin https://github.com/$REPO_NAME.git
                 git fetch origin dev2
-                git checkout -b dev2 origin/dev2 || { echo "Fatal: Could not get latest code."; exit 1; }
+                git checkout -b dev2 origin/dev2 || exit 1
               }
             fi
 
-
-            echo "Stopping running Docker containers..."
+            echo "Stopping existing containers..."
             docker-compose -f deploy/docker-compose.yml down || true
 
-            echo "Running deployment script..."
+            echo "Running deploy script..."
             chmod +x ./deploy.sh
             ./deploy.sh --up
 
-            echo "Pruning unused Docker resources..."
-            docker system prune -f
+            echo "Cleaning up unused Docker resources..."
+            docker system prune -f || true
           EOF
