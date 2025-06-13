@@ -46,14 +46,14 @@ jobs:
               echo "Cloning repository for first time..."
               git clone --branch dev_oracle https://github.com/$REPO_NAME.git .
             else
-              echo "Pulling latest code from dev2 branch..."
-              git pull origin dev2 || {
+              echo "Pulling latest code from dev_oracle branch..."
+              git pull origin dev_oracle || {
                 echo "Error pulling code, retrying with fresh clone..."
                 rm -rf .git
                 git init
                 git remote add origin https://github.com/$REPO_NAME.git
-                git fetch origin dev2
-                git checkout -b dev2 origin/dev2 || exit 1
+                git fetch origin dev_oracle
+                git checkout -b dev_oracle origin/dev_oracle || exit 1
               }
             fi
 
