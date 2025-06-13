@@ -47,8 +47,9 @@ jobs:
             echo "📥 Cloning latest code..."
             git clone --branch dev_oracle https://github.com/$REPO_NAME.git .
 
-            echo "🔑 Setting environment variables..."
-            cp deploy/.env.prod .env || echo "No .env.prod found, skipping..."
+            echo "📝 Writing .env files..."
+            echo "$API_ENV_CONTENT" > ./api-service/.env
+            echo "$SOCIAL_ENV_CONTENT" > ./social-media-service/.env
 
             echo "🧹 Stopping any running containers..."
             docker-compose -f deploy/docker-compose.yml down || true
