@@ -56,7 +56,7 @@ jobs:
             echo "🔍 Printing SOCIAL_ENV_CONTENT before writing..."
             echo "$SOCIAL_ENV_CONTENT"
 
-            echo "📝 Writing .env files..."
+            echo "📝 Wriing .env files..."
             printf "%s\n" "$API_ENV_CONTENT" > ./api-service/.env
             printf "%s\n" "$SOCIAL_ENV_CONTENT" > ./social-media-service/.env
 
