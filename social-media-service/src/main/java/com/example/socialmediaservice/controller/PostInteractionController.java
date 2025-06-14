@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @CrossOrigin(
-        origins = "http://localhost:3000",
+        origins = {"http://localhost:3000", "https://go-together-uom.vercel.app"},
         allowCredentials = "true"
 )
 @RestController

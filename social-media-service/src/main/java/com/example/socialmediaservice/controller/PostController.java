@@ -33,7 +33,7 @@ public class PostController {
     }
 
     // 2. Get all posts created by a specific user
-    @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+    @CrossOrigin(origins ={"http://localhost:3000", "https://go-together-uom.vercel.app"}, allowCredentials = "true")
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<PostDTO>> getPostsByUser(@PathVariable String userId) {
         return ResponseEntity.ok(postService.getPostsByUser(userId));
@@ -53,7 +53,7 @@ public class PostController {
         return ResponseEntity.ok(postService.updatePost(postId, requestDTO));
     }
 
-    @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+    @CrossOrigin(origins = {"http://localhost:3000", "https://go-together-uom.vercel.app"}, allowCredentials = "true")
     @GetMapping("/for-you")
     public ResponseEntity<PostsPageDTO> getForYouPosts(
             @RequestParam(required = false) String cursor,

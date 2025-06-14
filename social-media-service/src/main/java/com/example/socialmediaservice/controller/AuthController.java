@@ -26,7 +26,7 @@ import java.util.Map;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:3000", "https://go-together-uom.vercel.app"}, allowCredentials = "true")
 public class AuthController {
 
     private final AuthService authService;
