@@ -82,4 +82,8 @@ sudo ln -s /snap/bin/certbot /usr/bin/certbot
 sudo snap set certbot trust-plugin-with-root=ok
 sudo snap install certbot-dns-cloudflare  # optional, only if using Cloudflare
 
+sudo dnf install python3-pip -y
+pip3 install certbot certbot-nginx --break-system-packages
+
+
 sudo certbot --nginx
