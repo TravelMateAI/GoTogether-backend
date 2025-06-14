@@ -1,63 +1,85 @@
-#!/bin/bash
+# #!/bin/bash
 
-set -e
+# set -e
 
-echo "🔧 Installing NGINX..."
-sudo dnf install -y nginx
+# echo "🔧 Installing NGINX..."
+# sudo dnf install -y nginx
 
-echo "🔧 Enabling and starting NGINX..."
-sudo systemctl enable nginx
-sudo systemctl start nginx
+# echo "🔧 Enabling and starting NGINX..."
+# sudo systemctl enable nginx
+# sudo systemctl start nginx
 
-echo "🔐 Creating SSL directory and generating self-signed certificate..."
-sudo mkdir -p /etc/nginx/ssl
+# echo "🔐 Creating SSL directory and generating self-signed certificate..."
+# sudo mkdir -p /etc/nginx/ssl
 
-sudo openssl req -x509 -nodes -days 365 \
-  -newkey rsa:2048 \
-  -keyout /etc/nginx/ssl/nginx-selfsigned.key \
-  -out /etc/nginx/ssl/nginx-selfsigned.crt \
-  -subj "/C=LK/ST=Western/L=Colombo/O=University/OU=CS/CN=144.24.107.189"
+# sudo openssl req -x509 -nodes -days 365 \
+#   -newkey rsa:2048 \
+#   -keyout /etc/nginx/ssl/nginx-selfsigned.key \
+#   -out /etc/nginx/ssl/nginx-selfsigned.crt \
+#   -subj "/C=LK/ST=Western/L=Colombo/O=University/OU=CS/CN=144.24.107.189"
 
-echo "📝 Creating NGINX reverse proxy config..."
-sudo tee /etc/nginx/conf.d/backend.conf > /dev/null <<EOF
-# Redirect HTTP to HTTPS
-server {
-    listen 80;
-    server_name 144.24.107.189;
+# echo "📝 Creating NGINX reverse proxy config..."
+# sudo tee /etc/nginx/conf.d/backend.conf > /dev/null <<EOF
+# # Redirect HTTP to HTTPS
+# server {
+#     listen 80;
+#     server_name 144.24.107.189;
 
-    location / {
-        return 301 https://\$host\$request_uri;
-    }
-}
+#     location / {
+#         return 301 https://\$host\$request_uri;
+#     }
+# }
 
-# HTTPS reverse proxy
-server {
-    listen 443 ssl;
-    server_name 144.24.107.189;
+# # HTTPS reverse proxy
+# server {
+#     listen 443 ssl;
+#     server_name 144.24.107.189;
 
-    ssl_certificate /etc/nginx/ssl/nginx-selfsigned.crt;
-    ssl_certificate_key /etc/nginx/ssl/nginx-selfsigned.key;
+#     ssl_certificate /etc/nginx/ssl/nginx-selfsigned.crt;
+#     ssl_certificate_key /etc/nginx/ssl/nginx-selfsigned.key;
 
-    location /api/ {
-        proxy_pass http://localhost:8080/;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \$scheme;
-    }
+#     location /api/ {
+#         proxy_pass http://127.0.0.1:8080;
+#         proxy_set_header Host \$host;
+#         proxy_set_header X-Real-IP \$remote_addr;
+#         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+#         proxy_set_header X-Forwarded-Proto \$scheme;
+#     }
 
-    location / {
-        return 404;
-    }
-}
-EOF
+#     location / {
+#         return 404;
+#     }
+# }
+# EOF
 
-echo "🔓 Allowing HTTPS traffic in firewall..."
-sudo firewall-cmd --add-service=https --permanent
-sudo firewall-cmd --add-service=http --permanent
-sudo firewall-cmd --reload
+# echo "🔓 Allowing HTTPS traffic in firewall..."
+# sudo firewall-cmd --add-service=https --permanent
+# sudo firewall-cmd --add-service=http --permanent
+# sudo firewall-cmd --reload
 
-echo "🔁 Restarting NGINX to apply changes..."
-sudo nginx -t && sudo systemctl restart nginx
+# echo "🔁 Restarting NGINX to apply changes..."
+# sudo nginx -t && sudo systemctl restart nginx
 
 echo "✅ NGINX with HTTPS reverse proxy is ready on https://144.24.107.189"
+
+sudo dnf install epel-release -y  # Just in case
+sudo dnf install snapd -y
+sudo systemctl enable --now snapd.socket
+sudo ln -s /var/lib/snapd/snap /snap
+
+# Restart shell to pick up `snap`
+exec "$SHELL"
+
+# Install Certbot
+sudo snap install core
+sudo snap refresh core
+sudo snap install --classic certbot
+
+# Link certbot
+sudo ln -s /snap/bin/certbot /usr/bin/certbot
+
+# Now install nginx plugin (optional if you're using certbot directly with nginx)
+sudo snap set certbot trust-plugin-with-root=ok
+sudo snap install certbot-dns-cloudflare  # optional, only if using Cloudflare
+
+sudo certbot --nginx
