@@ -58,7 +58,17 @@ public class PostController {
     public ResponseEntity<PostsPageDTO> getForYouPosts(
             @RequestParam(required = false) String cursor,
             @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(postService.getForYouFeed(cursor, size));
+        // return ResponseEntity.ok(postService.getForYouFeed(cursor, size));
+                       // Temporarily bypass the service call
+        log.warn("Executing TEMPORARILY SIMPLIFIED getForYouPosts endpoint in PostController for diagnosis.");
+
+        PostsPageDTO simplifiedPage = new PostsPageDTO();
+        
+        // Option 1: Empty list of posts
+        simplifiedPage.setPosts(new java.util.ArrayList<>());
+        simplifiedPage.setNextCursor(null);
+
+        return ResponseEntity.ok(simplifiedPage);
     }
 
 }
