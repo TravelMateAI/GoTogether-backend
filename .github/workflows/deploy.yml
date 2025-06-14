@@ -29,19 +29,29 @@ jobs:
           echo "  StrictHostKeyChecking no" >> ~/.ssh/config
           echo "  UserKnownHostsFile /dev/null" >> ~/.ssh/config
 
+      - name: Create temp .env files
+        run: |
+          echo "$API_ENV_CONTENT" > api.env
+          echo "$SOCIAL_ENV_CONTENT" > social.env
+
+      - name: Upload .env files to Oracle VM
+        run: |
+          scp -i ~/.ssh/id_rsa api.env $OCI_USERNAME@$OCI_HOST:/home/$OCI_USERNAME/app/api-service/.env
+          scp -i ~/.ssh/id_rsa social.env $OCI_USERNAME@$OCI_HOST:/home/$OCI_USERNAME/app/social-media-service/.env
+
       - name: Deploy to Oracle Cloud Instance
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $OCI_USERNAME@$OCI_HOST <<EOF
+          ssh -i ~/.ssh/id_rsa $OCI_USERNAME@$OCI_HOST <<EOF
             set -e
 
             echo "🔄 Updating packages..."
             sudo dnf update -y
 
-            echo "🐳 Starting Docker if not running..."
+            echo "🐳 Starting Docker..."
             sudo systemctl start docker || true
             sudo systemctl enable docker || true
 
-            echo "🧹 Setting up app directory..."
+            echo "🧹 Preparing app directory..."
             APP_DIR="/home/$OCI_USERNAME/app"
             sudo rm -rf "\$APP_DIR"
             mkdir -p "\$APP_DIR"
@@ -50,33 +60,21 @@ jobs:
             echo "📥 Cloning latest code..."
             git clone --branch dev_oracle https://github.com/$REPO_NAME.git .
 
-            echo "🔍 Printing API_ENV_CONTENT before writing..."
-            echo "$API_ENV_CONTENT"
+            echo "📦 Verifying uploaded .env files..."
+            ls -l ./api-service/.env || echo "❌ Missing API .env"
+            ls -l ./social-media-service/.env || echo "❌ Missing Social .env"
 
-            echo "🔍 Printing SOCIAL_ENV_CONTENT before writing..."
-            echo "$SOCIAL_ENV_CONTENT"
+            echo "📦 Showing contents..."
+            cat ./api-service/.env || echo "❌ Can't read API .env"
+            cat ./social-media-service/.env || echo "❌ Can't read Social .env"
 
-            echo "📝 Writing .env files with absolute paths..."
-            echo "$API_ENV_CONTENT" > /home/$OCI_USERNAME/app/api-service/.env
-            echo "$SOCIAL_ENV_CONTENT" > /home/$OCI_USERNAME/app/social-media-service/.env
-
-            echo "📂 Checking if .env files exist..."
-            ls -l /home/$OCI_USERNAME/app/api-service/.env || echo "❌ .env for API not found"
-            ls -l /home/$OCI_USERNAME/app/social-media-service/.env || echo "❌ .env for Social Media not found"
-
-            echo "📦 Verifying written .env for api-service..."
-            cat /home/$OCI_USERNAME/app/api-service/.env || echo "❌ Cannot read API .env"
-
-            echo "📦 Verifying written .env for social-media-service..."
-            cat /home/$OCI_USERNAME/app/social-media-service/.env || echo "❌ Cannot read Social .env"
-
-            echo "🧹 Stopping any running containers..."
+            echo "🧹 Stopping containers..."
             docker-compose -f deploy/docker-compose.yml down || true
 
-            echo "🚀 Running deploy script..."
+            echo "🚀 Running deploy.sh..."
             chmod +x ./deploy.sh
             ./deploy.sh --up
 
-            echo "🧼 Cleaning up Docker..."
+            echo "🧼 Cleaning Docker..."
             docker system prune -f || true
           EOF
