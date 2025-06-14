@@ -60,6 +60,11 @@ jobs:
             printf "%s\n" "$API_ENV_CONTENT" > ./api-service/.env
             printf "%s\n" "$SOCIAL_ENV_CONTENT" > ./social-media-service/.env
 
+            echo "📂 Checking if .env files exist..."
+            ls -l ./api-service/.env || echo "❌ .env for API not found"
+            ls -l ./social-media-service/.env || echo "❌ .env for Social Media not found"
+            ls 
+
             echo "📦 Verifying written .env for api-service..."
             cat ./api-service/.env
 
