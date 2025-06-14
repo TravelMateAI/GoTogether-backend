@@ -12,7 +12,7 @@ import (
 	"log"
 	"net"
 
-	"github.com/gin-contrib/cors"
+	// "github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
 )
@@ -40,15 +40,15 @@ func main() {
 
 	r := gin.Default()
 
-	// CORS Middleware Configuration
-	configCors := cors.DefaultConfig()
-	configCors.AllowAllOrigins = true
-	configCors.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"}
-	configCors.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
-	configCors.ExposeHeaders = []string{"Content-Length"}
-	configCors.AllowCredentials = true
+	// // CORS Middleware Configuration
+	// configCors := cors.DefaultConfig()
+	// configCors.AllowAllOrigins = true
+	// configCors.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"}
+	// configCors.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
+	// configCors.ExposeHeaders = []string{"Content-Length"}
+	// configCors.AllowCredentials = true
 
-	r.Use(cors.New(configCors))
+	// r.Use(cors.New(configCors))
 	routes.RegisterRoutes(r)
 
 	log.Printf("HTTP server listening on port %s", port)
