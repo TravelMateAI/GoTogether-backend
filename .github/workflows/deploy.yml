@@ -9,6 +9,13 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    env:
+      OCI_HOST: ${{ secrets.OCI_HOST }}
+      OCI_USERNAME: ${{ secrets.OCI_USERNAME }}
+      REPO_NAME: ${{ github.repository }}
+      API_ENV_CONTENT: ${{ secrets.API_ENV_CONTENT }}
+      SOCIAL_ENV_CONTENT: ${{ secrets.SOCIAL_ENV_CONTENT }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -23,10 +30,6 @@ jobs:
           echo "  UserKnownHostsFile /dev/null" >> ~/.ssh/config
 
       - name: Deploy to Oracle Cloud Instance
-        env:
-          OCI_HOST: ${{ secrets.OCI_HOST }}
-          OCI_USERNAME: ${{ secrets.OCI_USERNAME }}
-          REPO_NAME: ${{ github.repository }}
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $OCI_USERNAME@$OCI_HOST <<EOF
             set -e
@@ -47,9 +50,21 @@ jobs:
             echo "📥 Cloning latest code..."
             git clone --branch dev_oracle https://github.com/$REPO_NAME.git .
 
+            echo "🔍 Printing API_ENV_CONTENT before writing..."
+            echo "$API_ENV_CONTENT"
+
+            echo "🔍 Printing SOCIAL_ENV_CONTENT before writing..."
+            echo "$SOCIAL_ENV_CONTENT"
+
             echo "📝 Writing .env files..."
-            echo "$API_ENV_CONTENT" > ./api-service/.env
-            echo "$SOCIAL_ENV_CONTENT" > ./social-media-service/.env
+            printf "%s\n" "$API_ENV_CONTENT" > ./api-service/.env
+            printf "%s\n" "$SOCIAL_ENV_CONTENT" > ./social-media-service/.env
+
+            echo "📦 Verifying written .env for api-service..."
+            cat ./api-service/.env
+
+            echo "📦 Verifying written .env for social-media-service..."
+            cat ./social-media-service/.env
 
             echo "🧹 Stopping any running containers..."
             docker-compose -f deploy/docker-compose.yml down || true
