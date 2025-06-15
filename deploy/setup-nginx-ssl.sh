@@ -40,27 +40,27 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
-    location /auth/ {
-        rewrite ^/auth/(.*)$ /$1 break;
+    # location /auth/ {
+    #     rewrite ^/auth/(.*)$ /$1 break;
 
-        proxy_pass http://127.0.0.1:8084/;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+    #     proxy_pass http://127.0.0.1:8084/;
+    #     proxy_set_header Host $host;
+    #     proxy_set_header X-Real-IP $remote_addr;
+    #     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    #     proxy_set_header X-Forwarded-Proto $scheme;
 
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
+    #     proxy_http_version 1.1;
+    #     proxy_set_header Upgrade $http_upgrade;
+    #     proxy_set_header Connection "upgrade";
 
-        # Rewriting internal paths in HTML responses to use /auth/ prefix
-        sub_filter_once off;
-        sub_filter_types text/html;
+    #     # Rewriting internal paths in HTML responses to use /auth/ prefix
+    #     sub_filter_once off;
+    #     sub_filter_types text/html;
 
-        sub_filter 'href="/' 'href="/auth/';
-        sub_filter 'src="/' 'src="/auth/';
-        sub_filter 'action="/' 'action="/auth/';
-    }
+    #     sub_filter 'href="/' 'href="/auth/';
+    #     sub_filter 'src="/' 'src="/auth/';
+    #     sub_filter 'action="/' 'action="/auth/';
+    # }
 
     location / {
         return 404;
