@@ -113,13 +113,13 @@ services:
       # KC_HOSTNAME_URL: http://auth-service:8080
       KC_HTTPS_CERTIFICATE_FILE: /opt/keycloak/certs/fullchain.pem
       KC_HTTPS_CERTIFICATE_KEY_FILE: /opt/keycloak/certs/privkey.pem
-      KC_HOSTNAME_URL: http://gotogetheruom.duckdns.org:8084
+      KC_HOSTNAME_URL: https://gotogetheruom.duckdns.org:8446
       KEYCLOAK_IMPORT: /opt/keycloak/data/import/kong-realm.json
     volumes:
       - ../auth-service/keycloak-import:/opt/keycloak/data/import
       - keycloak_data:/opt/keycloak/data
-      - /etc/letsencrypt/live/gotogetheruom.duckdns.org/fullchain.pem:/opt/keycloak/certs/fullchain.pem:ro
-      - /etc/letsencrypt/live/gotogetheruom.duckdns.org/privkey.pem:/opt/keycloak/certs/privkey.pem:ro
+      - /etc/letsencrypt/archive/gotogetheruom.duckdns.org/fullchain1.pem:/opt/keycloak/certs/fullchain.pem:ro
+      - /etc/letsencrypt/archive/gotogetheruom.duckdns.org/privkey1.pem:/opt/keycloak/certs/privkey.pem:ro
     networks:
       - kong-net
     ports:
