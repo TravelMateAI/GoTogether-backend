@@ -52,6 +52,14 @@ server {
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
+
+        # Rewriting internal paths in HTML responses to use /auth/ prefix
+        sub_filter_once off;
+        sub_filter_types text/html;
+
+        sub_filter 'href="/' 'href="/auth/';
+        sub_filter 'src="/' 'src="/auth/';
+        sub_filter 'action="/' 'action="/auth/';
     }
 
     location / {
