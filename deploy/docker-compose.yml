@@ -100,8 +100,7 @@ services:
       # - --hostname=auth-service
       # - --http-port=8080
       - --hostname=gotogetheruom.duckdns.org
-      - --hostname-url=https://gotogetheruom.duckdns.org/auth
-      # - --http-port=8084
+      - --http-port=8084
     environment:
       KC_DB: postgres
       KC_DB_URL: "jdbc:postgresql://aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=require&connectTimeout=10"
@@ -111,7 +110,7 @@ services:
       KEYCLOAK_ADMIN_PASSWORD: admin
       # KC_HOSTNAME_URL: http://localhost:8084
       # KC_HOSTNAME_URL: http://auth-service:8080
-      KC_HOSTNAME_URL: https://gotogetheruom.duckdns.org/auth
+      KC_HOSTNAME_URL: http://gotogetheruom.duckdns.org:8084
       KEYCLOAK_IMPORT: /opt/keycloak/data/import/kong-realm.json
     volumes:
       - ../auth-service/keycloak-import:/opt/keycloak/data/import
