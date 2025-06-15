@@ -41,21 +41,13 @@ server {
     }
 
     location /auth/ {
+        rewrite ^/auth/(.*)$ /$1 break;
+
         proxy_pass http://127.0.0.1:8084/;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-
-        sub_filter '/resources/' '/auth/resources/';
-        sub_filter '/js/' '/auth/js/';
-        sub_filter '/realms/' '/auth/realms/';
-        sub_filter '/admin/' '/auth/admin/';
-        sub_filter '/protocol/' '/auth/protocol/';
-        sub_filter '/favicon.ico' '/auth/favicon.ico';
-        sub_filter '/welcome-content/' '/auth/welcome-content/';
-        sub_filter '/login-actions/' '/auth/login-actions/';
-        sub_filter_once off;
 
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
