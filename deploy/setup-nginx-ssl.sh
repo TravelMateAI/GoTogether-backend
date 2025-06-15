@@ -13,42 +13,40 @@ sudo systemctl enable nginx
 sudo systemctl start nginx
 
 echo "📝 Creating NGINX reverse proxy config..."
-sudo tee $NGINX_CONF > /dev/null <<EOF
+sudo tee $NGINX_CONF > /dev/null <<'EOF' 
 # Redirect HTTP to HTTPS
 server {
     listen 80;
-    server_name $DOMAIN;
+    server_name gotogetheruom.duckdns.org;
 
     location / {
-        return 301 https://\$host\$request_uri;
+        return 301 https://$host$request_uri;
     }
 }
 
 # HTTPS reverse proxy
 server {
     listen 443 ssl;
-    server_name $DOMAIN;
+    server_name gotogetheruom.duckdns.org;
 
-    ssl_certificate /etc/letsencrypt/live/$DOMAIN/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/$DOMAIN/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/gotogetheruom.duckdns.org/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/gotogetheruom.duckdns.org/privkey.pem;
 
     location /api/ {
         proxy_pass http://127.0.0.1:8080;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
 
-    # Proxy for Keycloak (on port 8084)
     location /auth/ {
         proxy_pass http://127.0.0.1:8084/;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
 
-        # Rewrite root-relative paths
         sub_filter '/resources/' '/auth/resources/';
         sub_filter '/js/' '/auth/js/';
         sub_filter '/realms/' '/auth/realms/';
@@ -63,7 +61,6 @@ server {
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
-    }
     }
 
     location / {
