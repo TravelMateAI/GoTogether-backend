@@ -51,7 +51,6 @@ server {
         sub_filter '/js/' '/auth/js/';
         sub_filter '/realms/' '/auth/realms/';
         sub_filter '/admin/' '/auth/admin/';
-        sub_filter '/auth/' '/auth/auth/';
         sub_filter '/protocol/' '/auth/protocol/';
         sub_filter '/favicon.ico' '/auth/favicon.ico';
         sub_filter '/welcome-content/' '/auth/welcome-content/';
@@ -69,7 +68,7 @@ server {
 }
 EOF
 
-echo "🔓 Configuring firewall rules..."
+echo "🔓 Configuring firewall rules...."
 sudo firewall-cmd --add-service=http --permanent
 sudo firewall-cmd --add-service=https --permanent
 sudo firewall-cmd --reload
