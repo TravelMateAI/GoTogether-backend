@@ -160,10 +160,10 @@ services:
         echo 'Waiting for realm kong...';
         sleep 5;
       done &&
-        until curl -sSf -k https://gotogetheruom.duckdns.org:8446/realms/kong/.well-known/openid-configuration; do
-        echo 'Waiting for realm kong...';
-        sleep 5;
-      done &&
+      #   until curl -sSf -k https://gotogetheruom.duckdns.org:8446/realms/kong/.well-known/openid-configuration; do
+      #   echo 'Waiting for realm kong...';
+      #   sleep 5;
+      # done &&
       echo 'Keycloak realm is ready. Starting app...' &&
       java -jar /app/social-media-service.jar
       "
