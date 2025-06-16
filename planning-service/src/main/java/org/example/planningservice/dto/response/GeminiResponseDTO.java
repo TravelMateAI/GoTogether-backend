@@ -1,20 +1,12 @@
 package org.example.planningservice.dto.response;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class GeminiResponseDTO {
     private String generatedContent;
-
-    public GeminiResponseDTO() {
-    }
-
-    public GeminiResponseDTO(String generatedContent) {
-        this.generatedContent = generatedContent;
-    }
-
-    public String getGeneratedContent() {
-        return generatedContent;
-    }
-
-    public void setGeneratedContent(String generatedContent) {
-        this.generatedContent = generatedContent;
-    }
 }

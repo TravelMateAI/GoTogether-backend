@@ -28,7 +28,7 @@ public class PipelineController {
         this.procedurePipe = procedurePipe;
     }
 
-    @PostMapping("/path")
+    @GetMapping("/path")
     public ResponseEntity<?> executePipeline(@RequestBody DirectionsRequestDTO routeRequest) {
 
         try {
@@ -43,9 +43,12 @@ public class PipelineController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<?> searchPlaces(@RequestParam String query, @RequestParam String location) {
+    public ResponseEntity<?> searchPlaces(@RequestParam String userId, @RequestParam String location) {
         try {
-            SearchPlacesRequestDTO request = new SearchPlacesRequestDTO(query, location);
+            SearchPlacesRequestDTO request = new SearchPlacesRequestDTO();
+            request.setUserId(userId);
+            request.setLocation(location);
+
             SearchPlacesResponseDTO response = procedurePipe.execute(request);
             return ResponseEntity.ok(response);
         } catch (Exception e) {

@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SearchPlacesRequestDTO {
+    private String userId;
     private String query;
     private String location;
 }

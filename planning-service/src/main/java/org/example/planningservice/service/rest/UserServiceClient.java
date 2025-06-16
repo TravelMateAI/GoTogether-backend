@@ -11,17 +11,17 @@ public class UserServiceClient {
     private final RestTemplate restTemplate;
 
     @Value("${social-media-service.url}")
-    private String tripServiceUrl;
+    private String socialMediaServiceUrl;
 
     @Value("${social-media-service.trip-history-path}")
-    private String tripServiceUrl;
+    private String socialMediaServiceTripHistoryPath;
 
     public UserServiceClient(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
     public UserTripHistoryDTO getUserTripHistory(String userId) {
-        String url = tripServiceUrl + "/api/trips/history/" + userId;
+        String url = socialMediaServiceUrl + socialMediaServiceTripHistoryPath + userId;
         return restTemplate.getForObject(url, UserTripHistoryDTO.class);
     }
 }

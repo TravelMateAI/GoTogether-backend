@@ -11,8 +11,7 @@ public class SearchPlacesValidationBlock implements Block<SearchPlacesRequestDTO
 
     @Override
     public SearchPlacesRequestDTO process(SearchPlacesRequestDTO request) {
-        if (request == null || request.getQuery() == null || request.getQuery().isBlank()
-                || request.getLocation() == null || request.getLocation().isBlank()) {
+        if (request == null || request.getLocation() == null || request.getLocation().isBlank()) {
             throw new IllegalArgumentException("Invalid search request: missing query or location.");
         }
         log.info("✅ Search request validated: {}", request);

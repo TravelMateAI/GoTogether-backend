@@ -66,7 +66,7 @@ public class GrpcTestController {
     @GetMapping("/maps/search")
     public ResponseEntity<?> searchPlaces(@RequestParam String query, @RequestParam String location) {
         try {
-            SearchPlacesResponseDTO response = mapService.searchPlaces(new SearchPlacesRequestDTO(query, location));
+            SearchPlacesResponseDTO response = mapService.searchPlaces(new SearchPlacesRequestDTO("001", query, location));
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error calling Maps SearchPlaces: " + e.getMessage());
