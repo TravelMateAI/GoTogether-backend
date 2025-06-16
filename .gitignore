@@ -49,3 +49,6 @@ planning-service/secret_keys.txt
 !**/src/test/**/bin/
 !**/src/main/**/out/
 !**/src/test/**/out/
+
+**/build/
+**/.gradle/
