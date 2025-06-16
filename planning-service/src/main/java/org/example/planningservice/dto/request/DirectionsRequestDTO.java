@@ -10,4 +10,9 @@ import lombok.NoArgsConstructor;
 public class DirectionsRequestDTO {
     private String origin;
     private String destination;
+
+    public boolean isBlank() {
+        return origin == null || origin.isBlank()
+                || destination == null || destination.isBlank();
+    }
 }
