@@ -39,7 +39,9 @@ public class AuthController {
             minimalUser.put("userId", user.getUserId());
             minimalUser.put("username", user.getUsername());
             minimalUser.put("firstName", user.getFirstName());
+            minimalUser.put("email", user.getEmail());
             minimalUser.put("avatarUrl", user.getAvatarUrl());
+            minimalUser.put("bio", user.getBio());
 
             String json = objectMapper.writeValueAsString(minimalUser);
             return Base64.getUrlEncoder().encodeToString(json.getBytes(StandardCharsets.UTF_8));
