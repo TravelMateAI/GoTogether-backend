@@ -53,4 +53,9 @@ public class User {
     @Column(name = "following_user_id")
     private Set<String> followingIds = new HashSet<>();
 
+    @ElementCollection
+    @CollectionTable(name = "user_places", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "place")
+    private List<String> places = new ArrayList<>();
+
 }

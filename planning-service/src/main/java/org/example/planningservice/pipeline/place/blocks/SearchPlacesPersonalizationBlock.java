@@ -1,12 +1,14 @@
 package org.example.planningservice.pipeline.place.blocks;
 
 import lombok.extern.slf4j.Slf4j;
+import org.example.planningservice.dto.GeminiHttpResponse;
 import org.example.planningservice.dto.UserTripHistoryDTO;
 import org.example.planningservice.dto.request.GeminiRequestDTO;
 import org.example.planningservice.dto.request.SearchPlacesRequestDTO;
 import org.example.planningservice.dto.response.GeminiResponseDTO;
 import org.example.planningservice.framework.pipeline.Block;
 import org.example.planningservice.service.grpc.GeminiService;
+import org.example.planningservice.service.rest.GeminiServiceClient;
 import org.example.planningservice.service.rest.UserServiceClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -18,12 +20,12 @@ import java.util.List;
 public class SearchPlacesPersonalizationBlock implements Block<SearchPlacesRequestDTO, SearchPlacesRequestDTO> {
 
     private final UserServiceClient userServiceClient;
-    private final GeminiService geminiService;
+    private final GeminiServiceClient geminiServiceClient;
 
     @Autowired
-    public SearchPlacesPersonalizationBlock(UserServiceClient userServiceClient, GeminiService geminiService) {
+    public SearchPlacesPersonalizationBlock(UserServiceClient userServiceClient, GeminiServiceClient geminiServiceClient) {
         this.userServiceClient = userServiceClient;
-        this.geminiService = geminiService;
+        this.geminiServiceClient = geminiServiceClient;
     }
 
     @Override
@@ -42,21 +44,35 @@ public class SearchPlacesPersonalizationBlock implements Block<SearchPlacesReque
         request.setQuery("visitplaces");
         // Use Gemini to generate a smarter query
         String prompt = String.format(
-                "User previously visited: %s. Current location is %s. Rewrite '%s' into " +
-                        "a more customized place search query for Google Maps API.",
+                "The user has previously visited: %s. They're currently searching in %s. " +
+                        "Generate only one customized query string that can be used directly in the Google Maps Place Search API. " +
+                        "Output only the query, with no explanation, markdown, or additional formatting.Do not URL encode it.",
                 String.join(", ", visited),
                 request.getLocation(),
                 request.getQuery()
         );
 
-//        GeminiRequestDTO geminiRequest = new GeminiRequestDTO(prompt);
-//        GeminiResponseDTO response = geminiService.generateContent(geminiRequest);
-//
-//        String customizedQuery = response.getGeneratedContent();
-//        log.info("🤖 Gemini-customized query: {}", customizedQuery);
-//
-//        request.setQuery(customizedQuery);
+        GeminiHttpResponse response = geminiServiceClient.getAIResponse(prompt);
+
+        String customizedQuery = extractText(response);
+        log.info("🤖 Gemini-customized query: {}", customizedQuery);
+
+        request.setQuery(customizedQuery);
         return request;
+    }
+
+
+    private String extractText(GeminiHttpResponse response) {
+        if (response == null || response.getCandidates() == null || response.getCandidates().isEmpty()) {
+            return null;
+        }
+
+        GeminiHttpResponse.Candidate candidate = response.getCandidates().get(0);
+        if (candidate.getContent() == null || candidate.getContent().getParts() == null || candidate.getContent().getParts().isEmpty()) {
+            return null;
+        }
+
+        return candidate.getContent().getParts().get(0).getText().trim().replaceAll("\\s+", "");
     }
 }
 

@@ -1,6 +1,7 @@
 package org.example.planningservice.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.example.planningservice.dto.GeminiHttpResponse;
 import org.example.planningservice.dto.request.DirectionsRequestDTO;
 import org.example.planningservice.dto.request.SearchPlacesRequestDTO;
 import org.example.planningservice.dto.response.DirectionsResponseDTO;
@@ -8,6 +9,7 @@ import org.example.planningservice.dto.response.SearchPlacesResponseDTO;
 import org.example.planningservice.exception.DirectionsServiceException;
 import org.example.planningservice.pipeline.path.PathFindingPipe;
 import org.example.planningservice.pipeline.place.SearchPlacesProcedurePipe;
+import org.example.planningservice.service.rest.GeminiServiceClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,14 +23,28 @@ public class PipelineController {
 
     private final PathFindingPipe pathFindingPipe;
     private final SearchPlacesProcedurePipe procedurePipe;
+    private final GeminiServiceClient geminiServiceClient;
 
     @Autowired
-    public PipelineController(PathFindingPipe pathFindingPipe, SearchPlacesProcedurePipe procedurePipe) {
+    public PipelineController(
+            PathFindingPipe pathFindingPipe,
+            SearchPlacesProcedurePipe procedurePipe,
+            GeminiServiceClient geminiServiceClient
+    ) {
         this.pathFindingPipe = pathFindingPipe;
         this.procedurePipe = procedurePipe;
+        this.geminiServiceClient = geminiServiceClient;
     }
 
-    @GetMapping("/path")
+
+
+    @GetMapping("/generate")
+    public ResponseEntity<?> generate(@RequestParam String prompt) {
+        GeminiHttpResponse response = geminiServiceClient.getAIResponse(prompt);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/path")
     public ResponseEntity<?> executePipeline(@RequestBody DirectionsRequestDTO routeRequest) {
 
         try {
