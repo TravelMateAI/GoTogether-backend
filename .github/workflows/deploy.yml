@@ -3,7 +3,7 @@ name: Deploy to Oracle Cloud VM
 on:
   push:
     branches:
-      - dev_oracle
+      - dev_oracle2
 
 jobs:
   deploy:
@@ -58,7 +58,7 @@ jobs:
             cd "\$APP_DIR"
 
             echo "📥 Cloning latest code..."
-            git clone --branch dev_oracle https://github.com/$REPO_NAME.git .
+            git clone --branch dev_oracle2 https://github.com/$REPO_NAME.git .
 
             echo "📦 Verifying uploaded .env files..."
             ls -l ./api-service/.env || echo "❌ Missing API .env"
