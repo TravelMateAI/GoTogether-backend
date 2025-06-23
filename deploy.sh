@@ -43,11 +43,11 @@ SECTION_SEPARATOR="=============================================================
 COMPOSE_FILE="deploy/docker-compose.yml"
 
 SERVICES=(
-  "auth-service"
+  "keycloak"
   "api-gateway"
   "api-service"
   "planning-service"
-   "social-media-service"
+   "post-service"
 )
 
 
