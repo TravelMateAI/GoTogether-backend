@@ -37,7 +37,7 @@ jobs:
       - name: Upload .env files to Oracle VM
         run: |
           scp -i ~/.ssh/id_rsa api.env $OCI_USERNAME@$OCI_HOST:/home/$OCI_USERNAME/app/api-service/.env
-          scp -i ~/.ssh/id_rsa social.env $OCI_USERNAME@$OCI_HOST:/home/$OCI_USERNAME/app/social-media-service/.env
+          scp -i ~/.ssh/id_rsa social.env $OCI_USERNAME@$OCI_HOST:/home/$OCI_USERNAME/app/post-service/.env
 
       - name: Deploy to Oracle Cloud Instance
         run: |
@@ -62,11 +62,11 @@ jobs:
 
             echo "📦 Verifying uploaded .env files..."
             ls -l ./api-service/.env || echo "❌ Missing API .env"
-            ls -l ./social-media-service/.env || echo "❌ Missing Social .env"
+            ls -l ./post-service/.env || echo "❌ Missing Social .env"
 
             echo "📦 Showing contents..."
             cat ./api-service/.env || echo "❌ Can't read API .env"
-            cat ./social-media-service/.env || echo "❌ Can't read Social .env"
+            cat ./post-service/.env || echo "❌ Can't read Social .env"
 
             echo "🧹 Stopping containers..."
             docker-compose -f deploy/docker-compose.yml down || true

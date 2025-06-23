@@ -137,14 +137,14 @@ services:
     networks:
       - kong-net
 
-  social-media-service:
+  post-service:
     build:
-      context: ../social-media-service
-      # dockerfile:  ../social-media-service/Dockerfile
+      context: ../post-service
+      # dockerfile:  ../post-service/Dockerfile
     ports:
       - "8080:8080"
     env_file:
-      - ../social-media-service/.env
+      - ../post-service/.env
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
@@ -165,7 +165,7 @@ services:
         sleep 5;
       done &&
       echo 'Keycloak realm is ready. Starting app...' &&
-      java -jar /app/social-media-service.jar
+      java -jar /app/post-service.jar
       "
 
   api-service:
