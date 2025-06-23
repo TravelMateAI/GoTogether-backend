@@ -87,17 +87,17 @@ services:
       kong-migrations:
         condition: service_completed_successfully
 
-  auth-service:
+  keycloak:
     build:
       context: .
-      dockerfile: ../auth-service/Dockerfile.keycloak
+      dockerfile: ../keycloak/Dockerfile.keycloak
     command:
       - start-dev
       - --http-enabled=true
       - --http-host=0.0.0.0
       - --hostname-strict=false
       - --hostname-strict-https=false
-      # - --hostname=auth-service
+      # - --hostname=keycloak
       # - --http-port=8080
       - --hostname=gotogetheruom.duckdns.org
       - --http-port=8084
@@ -110,13 +110,13 @@ services:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
       # KC_HOSTNAME_URL: http://localhost:8084
-      # KC_HOSTNAME_URL: http://auth-service:8080
+      # KC_HOSTNAME_URL: http://keycloak:8080
       KC_HTTPS_CERTIFICATE_FILE: /opt/keycloak/certs/fullchain.pem
       KC_HTTPS_CERTIFICATE_KEY_FILE: /opt/keycloak/certs/privkey.pem
       KC_HOSTNAME_URL: https://gotogetheruom.duckdns.org:8446
       KEYCLOAK_IMPORT: /opt/keycloak/data/import/kong-realm.json
     volumes:
-      - ../auth-service/keycloak-import:/opt/keycloak/data/import
+      - ../keycloak/keycloak-import:/opt/keycloak/data/import
       - keycloak_data:/opt/keycloak/data
       - /etc/letsencrypt/archive/gotogetheruom.duckdns.org/fullchain1.pem:/opt/keycloak/certs/fullchain.pem:ro
       - /etc/letsencrypt/archive/gotogetheruom.duckdns.org/privkey1.pem:/opt/keycloak/certs/privkey.pem:ro
@@ -150,13 +150,13 @@ services:
     networks:
       - kong-net
     depends_on:
-      - auth-service
-      # auth-service:
+      - keycloak
+      # keycloak:
       #   condition: service_healthy
     command: >
       sh -c "
       echo 'Waiting for Keycloak to be ready...' &&
-      until curl -sSf http://auth-service:8080/realms/kong/.well-known/openid-configuration; do
+      until curl -sSf http://keycloak:8080/realms/kong/.well-known/openid-configuration; do
         echo 'Waiting for realm kong...';
         sleep 5;
       done &&
