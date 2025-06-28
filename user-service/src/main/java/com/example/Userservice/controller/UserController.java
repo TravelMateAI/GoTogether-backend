@@ -40,7 +40,7 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    @PreAuthorize("isAuthenticated()")
+//    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getCurrentUserProfile(@AuthenticationPrincipal Jwt jwt) {
         String userId = jwt.getSubject();
         logger.info("Fetching profile for current user: {}", userId);
@@ -53,7 +53,7 @@ public class UserController {
     }
 
     @PutMapping("/me")
-    @PreAuthorize("isAuthenticated()")
+//    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> updateCurrentUserProfile(@AuthenticationPrincipal Jwt jwt, @RequestBody UserProfileUpdateRequestDto updateRequest) {
         String userId = jwt.getSubject();
         logger.info("Updating profile for current user: {}", userId);
@@ -67,7 +67,7 @@ public class UserController {
     }
 
     @GetMapping("/username/{username}")
-    @PreAuthorize("isAuthenticated()") // Or permitAll if public lookup is allowed
+//    @PreAuthorize("isAuthenticated()") // Or permitAll if public lookup is allowed
     public ResponseEntity<?> getUserProfileByUsername(@PathVariable String username) {
         logger.info("Fetching profile for username: {}", username);
         User user = userProfileService.getUserByUsername(username);
@@ -78,7 +78,7 @@ public class UserController {
     }
 
     @GetMapping("/email/{email}")
-    @PreAuthorize("isAuthenticated()") // Or permitAll if public lookup is allowed
+//    @PreAuthorize("isAuthenticated()") // Or permitAll if public lookup is allowed
     public ResponseEntity<?> getUserProfileByEmail(@PathVariable String email) {
         // Ensure email path variable is properly encoded/decoded if it contains special characters
         logger.info("Fetching profile for email: {}", email);
@@ -91,7 +91,7 @@ public class UserController {
 
     // Follow APIs
     @PostMapping("/{targetUserId}/follow")
-    @PreAuthorize("isAuthenticated()")
+//    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> followUser(@AuthenticationPrincipal Jwt jwt, @PathVariable String targetUserId) {
         String currentUserId = jwt.getSubject();
         if (currentUserId.equals(targetUserId)) {
@@ -108,7 +108,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{targetUserId}/follow")
-    @PreAuthorize("isAuthenticated()")
+//    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> unfollowUser(@AuthenticationPrincipal Jwt jwt, @PathVariable String targetUserId) {
         String currentUserId = jwt.getSubject();
         try {
@@ -122,28 +122,28 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/followers")
-    @PreAuthorize("isAuthenticated()")
+//    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getFollowers(@PathVariable String userId) {
         // Add pagination here in a real app
         return ResponseEntity.ok(userProfileService.getFollowers(userId));
     }
 
     @GetMapping("/{userId}/following")
-    @PreAuthorize("isAuthenticated()")
+//    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getFollowing(@PathVariable String userId) {
         // Add pagination here in a real app
         return ResponseEntity.ok(userProfileService.getFollowing(userId));
     }
 
     @GetMapping("/{userId}/follow-info")
-    @PreAuthorize("isAuthenticated()")
+//    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getFollowInfo(@PathVariable String userId) {
         return ResponseEntity.ok(userProfileService.getFollowCounts(userId));
     }
 
     // Placeholder for avatar update - would typically involve multipart file upload
     @PutMapping("/me/avatar")
-    @PreAuthorize("isAuthenticated()")
+//    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> updateAvatar(@AuthenticationPrincipal Jwt jwt /*, @RequestParam("file") MultipartFile file */) {
         String userId = jwt.getSubject();
         // String avatarUrl = fileStorageService.storeFile(file, userId); // Example

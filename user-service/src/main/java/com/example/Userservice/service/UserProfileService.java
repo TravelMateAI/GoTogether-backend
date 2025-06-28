@@ -7,6 +7,7 @@ import com.example.Userservice.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -49,11 +51,11 @@ public class UserProfileService {
 
     @Transactional
     public User createUser(User user) {
-        logger.info("Attempting to create user: id={}, username={}", user.getId(), user.getUsername());
-        if (userRepository.existsById(user.getId())) {
-            logger.warn("User with ID {} already exists. Returning existing user.", user.getId());
-            return userRepository.findById(user.getId())
-                   .orElseThrow(() -> new IllegalStateException("User existed by ID but not found on immediate re-fetch for ID: " + user.getId()));
+        logger.info("Attempting to create user: id={}, username={}", user.getUserId(), user.getUsername());
+        if (userRepository.existsById(user.getUserId())) {
+            logger.warn("User with ID {} already exists. Returning existing user.", user.getUserId());
+            return userRepository.findById(user.getUserId())
+                   .orElseThrow(() -> new IllegalStateException("User existed by ID but not found on immediate re-fetch for ID: " + user.getUserId()));
         }
         userRepository.findByUsername(user.getUsername()).ifPresent(u -> {
             throw new DataIntegrityViolationException("Username '" + user.getUsername() + "' already exists.");
@@ -224,15 +226,8 @@ public class UserProfileService {
 
         newUser.setUsername(username);
         newUser.setEmail(email);
-        newUser.setHashedPassword(passwordEncoder.encode(plainPassword));
-        newUser.setRoles(roles != null && !roles.isEmpty() ? roles : "ROLE_USER"); // Default role
-        // newUser.setId(...) // If not auto-generated, this needs to be set.
-                             // For now, assuming User entity might have @GeneratedValue or ID is set by caller.
-                             // If ID is from Keycloak 'sub' for OIDC users, local users need a different ID scheme.
-                             // This example assumes the ID is already set on the 'user' object if using the generic 'createUser'
-                             // For this specific method, we're building the user. A UUID for ID is common.
         java.util.UUID uuid = java.util.UUID.randomUUID();
-        newUser.setId("local-" + uuid.toString()); // Prefix to distinguish from Keycloak IDs
+        newUser.setUserId("local-" + uuid.toString()); // Prefix to distinguish from Keycloak IDs
 
         return userRepository.save(newUser);
     }
@@ -242,9 +237,6 @@ public class UserProfileService {
         Optional<User> userOptional = userRepository.findByUsername(username);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-            if (user.getHashedPassword() != null && passwordEncoder.matches(plainPassword, user.getHashedPassword())) {
-                return Optional.of(user);
-            }
         }
         return Optional.empty();
     }

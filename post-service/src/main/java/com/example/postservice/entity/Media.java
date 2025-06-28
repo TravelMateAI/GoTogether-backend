@@ -1,4 +1,4 @@
-package com.example.socialmediaservice.entity;
+package com.example.postservice.entity;
 
 import com.example.socialmediaservice.enums.MediaType;
 import jakarta.persistence.*;

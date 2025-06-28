@@ -1,8 +1,9 @@
-package com.example.socialmediaservice.repository;
+package com.example.postservice.repository;
 
-import com.example.socialmediaservice.entity.Bookmark;
-import com.example.socialmediaservice.entity.Post;
-import com.example.socialmediaservice.entity.User;
+
+import com.example.postservice.entity.Bookmark;
+import com.example.postservice.entity.Post;
+import com.example.postservice.entity.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

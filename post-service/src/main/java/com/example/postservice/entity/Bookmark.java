@@ -1,4 +1,4 @@
-package com.example.socialmediaservice.entity;
+package com.example.postservice.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

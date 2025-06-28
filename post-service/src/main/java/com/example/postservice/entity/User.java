@@ -1,4 +1,4 @@
-package com.example.socialmediaservice.entity;
+package com.example.postservice.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;

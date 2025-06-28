@@ -1,12 +1,12 @@
 package com.example.Userservice.model; // Renamed
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 // import java.util.Date; // For timestamps
 // import jakarta.persistence.Temporal;
 // import jakarta.persistence.TemporalType;
@@ -14,54 +14,52 @@ import lombok.AllArgsConstructor;
 // import jakarta.persistence.PreUpdate;
 
 @Entity
-@Table(name = "user_profiles")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
+@ToString(exclude = {"followers", "following"})
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Table(name = "users")
 public class User {
 
     @Id
-    @Column(name = "id", nullable = false, updatable = false)
-    private String id; // Keycloak User ID (subject claim)
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String userId;
 
-    @Column(name = "username", nullable = false, unique = true)
+    @Column(unique = true, nullable = false)
     private String username;
 
-    @Column(name = "email", nullable = false, unique = true)
+    @Column(unique = true, nullable = true)
     private String email;
 
-    @Column(name = "first_name")
+    @Column(nullable = true)
     private String firstName;
 
-    @Column(name = "last_name")
+    @Column(nullable = true)
     private String lastName;
 
-    @Column(name = "avatar_url")
+    @Column(nullable = true, columnDefinition = "TEXT")
+    private String bio;
+
+    @Column(nullable = true)
     private String avatarUrl;
 
-    @Column(name = "hashed_password") // For locally registered users
-    private String hashedPassword;
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+//    @JsonIgnoreProperties("user") // Prevent recursion during serialization
+//    private List<Post> posts = new ArrayList<>();
 
-    @Column(name = "roles") // Comma-separated roles, e.g., "ROLE_USER,ROLE_ADMIN"
-    private String roles;
+    @ElementCollection
+    @CollectionTable(name = "user_followers", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "follower_user_id")
+    private Set<String> followerIds = new HashSet<>();
 
-    // Timestamps - uncomment if needed
-    // @Column(name = "created_at", nullable = false, updatable = false)
-    // @Temporal(TemporalType.TIMESTAMP)
-    // private Date createdAt;
+    @ElementCollection
+    @CollectionTable(name = "user_following", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "following_user_id")
+    private Set<String> followingIds = new HashSet<>();
 
-    // @Column(name = "updated_at", nullable = false)
-    // @Temporal(TemporalType.TIMESTAMP)
-    // private Date updatedAt;
+    @ElementCollection
+    @CollectionTable(name = "user_places", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "place")
+    private List<String> places = new ArrayList<>();
 
-    // @PrePersist
-    // protected void onCreate() {
-    //     createdAt = new Date();
-    //     updatedAt = new Date();
-    // }
-
-    // @PreUpdate
-    // protected void onUpdate() {
-    //     updatedAt = new Date();
-    // }
 }

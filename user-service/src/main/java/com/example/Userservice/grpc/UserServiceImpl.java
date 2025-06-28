@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -28,7 +29,7 @@ public class UserServiceImpl extends UserServiceGrpc.UserServiceImplBase {
     private com.example.Userservice.grpc.UserDetails toGrpcUserDetails(User user) {
         if (user == null) return com.example.Userservice.grpc.UserDetails.newBuilder().getDefaultInstanceForType();
         return com.example.Userservice.grpc.UserDetails.newBuilder()
-                .setUserId(user.getId())
+                .setUserId(user.getUserId())
                 .setUsername(user.getUsername() == null ? "" : user.getUsername())
                 .setFirstName(user.getFirstName() == null ? "" : user.getFirstName())
                 .setLastName(user.getLastName() == null ? "" : user.getLastName())
@@ -59,7 +60,7 @@ public class UserServiceImpl extends UserServiceGrpc.UserServiceImplBase {
         logger.info("gRPC createUserProfile called for userId: {}, username: {}", request.getUserId(), request.getUsername());
         try {
             User newUser = new User();
-            newUser.setId(request.getUserId());
+            newUser.setUserId(request.getUserId());
             newUser.setUsername(request.getUsername());
             newUser.setEmail(request.getEmail());
             newUser.setFirstName(request.getFirstName());
@@ -118,7 +119,7 @@ public class UserServiceImpl extends UserServiceGrpc.UserServiceImplBase {
                                  user.getFirstName() + (user.getLastName() != null && !user.getLastName().isEmpty() ? " " + user.getLastName() : "") :
                                  user.getUsername();
             UserBasicInfoResponse response = UserBasicInfoResponse.newBuilder()
-                    .setUserId(user.getId())
+                    .setUserId(user.getUserId())
                     .setUsername(user.getUsername())
                     .setDisplayName(displayName)
                     .setAvatarUrl(user.getAvatarUrl() == null ? "" : user.getAvatarUrl())
@@ -280,10 +281,10 @@ public class UserServiceImpl extends UserServiceGrpc.UserServiceImplBase {
                 User user = userOptional.get();
                 AuthenticationResponse response = AuthenticationResponse.newBuilder()
                     .setIsValid(true)
-                    .setUserId(user.getId())
+                    .setUserId(user.getUserId())
                     .setUsername(user.getUsername())
                     .setEmail(user.getEmail())
-                    .setRoles(user.getRoles() == null ? "" : user.getRoles())
+//                    .setRoles(user.getRoles() == null ? "" : user.getRoles())
                     .setActive(true) // Assuming user is active if authenticated
                     .setUserDetails(toGrpcUserDetails(user))
                     .build();

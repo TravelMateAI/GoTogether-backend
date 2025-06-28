@@ -1,4 +1,4 @@
-package com.example.socialmediaservice.service;
+package com.example.postservice.service;
 
 import com.example.socialmediaservice.entity.Comment;
 import com.example.socialmediaservice.entity.Post;
