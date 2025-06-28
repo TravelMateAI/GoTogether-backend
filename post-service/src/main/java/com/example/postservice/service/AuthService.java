@@ -1,7 +1,7 @@
-package com.example.socialmediaservice.service;
+package com.example.postservice.service;
 
-import com.example.socialmediaservice.entity.User;
-import com.example.socialmediaservice.repository.UserRepo;
+import com.example.postservice.entity.User;
+import com.example.postservice.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

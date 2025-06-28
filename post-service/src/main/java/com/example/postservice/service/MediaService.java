@@ -1,8 +1,8 @@
-package com.example.socialmediaservice.service;
+package com.example.postservice.service;
 
-import com.example.socialmediaservice.entity.Media;
-import com.example.socialmediaservice.enums.MediaType;
-import com.example.socialmediaservice.repository.MediaRepo;
+import com.example.postservice.entity.Media;
+import com.example.postservice.enums.MediaType;
+import com.example.postservice.repository.MediaRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

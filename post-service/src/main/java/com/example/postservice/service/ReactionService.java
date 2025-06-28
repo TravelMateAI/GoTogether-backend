@@ -1,10 +1,10 @@
-package com.example.socialmediaservice.service;
+package com.example.postservice.service;
 
-import com.example.socialmediaservice.entity.Post;
-import com.example.socialmediaservice.entity.Reaction;
-import com.example.socialmediaservice.entity.User;
-import com.example.socialmediaservice.enums.ReactionType;
-import com.example.socialmediaservice.repository.ReactionRepo;
+import com.example.postservice.entity.Post;
+import com.example.postservice.entity.Reaction;
+import com.example.postservice.entity.User;
+import com.example.postservice.enums.ReactionType;
+import com.example.postservice.repository.ReactionRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

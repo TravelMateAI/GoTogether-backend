@@ -1,9 +1,9 @@
-package com.example.socialmediaservice.controller;
+package com.example.postservice.controller;
 
-import com.example.socialmediaservice.service.AuthService;
-// import com.example.socialmediaservice.service.UserService; // Only needed if serializeUser were to call userService directly for some reason.
-import com.example.socialmediaservice.dto.LoginRequestDTO;
-import com.example.socialmediaservice.entity.User;
+import com.example.postservice.service.AuthService;
+// import com.example.postservice.service.UserService; // Only needed if serializeUser were to call userService directly for some reason.
+import com.example.postservice.dto.LoginRequestDTO;
+import com.example.postservice.entity.User;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;

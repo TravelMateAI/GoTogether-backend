@@ -1,9 +1,9 @@
-package com.example.socialmediaservice.controller;
+package com.example.postservice.controller;
 
-import com.example.socialmediaservice.dto.MediaCreateRequestDTO;
-import com.example.socialmediaservice.dto.MediaDTO;
-import com.example.socialmediaservice.entity.Media;
-import com.example.socialmediaservice.service.MediaService;
+import com.example.postservice.dto.MediaCreateRequestDTO;
+import com.example.postservice.dto.MediaDTO;
+import com.example.postservice.entity.Media;
+import com.example.postservice.service.MediaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

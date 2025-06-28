@@ -1,12 +1,12 @@
-package com.example.socialmediaservice.service;
+package com.example.postservice.service;
 
 
-import com.example.socialmediaservice.dto.*;
-import com.example.socialmediaservice.entity.*;
-import com.example.socialmediaservice.enums.ReactionType;
-import com.example.socialmediaservice.mapper.PostMapper;
-import com.example.socialmediaservice.repository.PostRepo;
-import com.example.socialmediaservice.repository.UserRepo;
+import com.example.postservice.dto.*;
+import com.example.postservice.entity.*;
+import com.example.postservice.enums.ReactionType;
+import com.example.postservice.mapper.PostMapper;
+import com.example.postservice.repository.PostRepo;
+import com.example.postservice.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;

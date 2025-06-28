@@ -1,6 +1,6 @@
 package com.example.postservice.repository;
 
-import com.example.socialmediaservice.entity.Post;
+import com.example.postservice.entity.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.domain.Pageable;

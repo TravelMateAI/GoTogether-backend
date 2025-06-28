@@ -1,10 +1,10 @@
-package com.example.socialmediaservice.service;
+package com.example.postservice.service;
 
-import com.example.socialmediaservice.dto.FollowerInfo;
-import com.example.socialmediaservice.dto.UpdateProfileRequest;
-import com.example.socialmediaservice.dto.UpdateProfileResponse;
-import com.example.socialmediaservice.entity.User;
-import com.example.socialmediaservice.repository.UserRepo;
+import com.example.postservice.dto.FollowerInfo;
+import com.example.postservice.dto.UpdateProfileRequest;
+import com.example.postservice.dto.UpdateProfileResponse;
+import com.example.postservice.entity.User;
+import com.example.postservice.repository.UserRepo;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

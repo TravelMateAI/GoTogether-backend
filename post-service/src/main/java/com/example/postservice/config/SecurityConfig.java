@@ -1,4 +1,4 @@
-package com.example.socialmediaservice.config;
+package com.example.postservice.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

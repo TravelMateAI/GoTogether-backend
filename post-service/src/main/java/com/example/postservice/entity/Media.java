@@ -1,6 +1,6 @@
 package com.example.postservice.entity;
 
-import com.example.socialmediaservice.enums.MediaType;
+import com.example.postservice.enums.MediaType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

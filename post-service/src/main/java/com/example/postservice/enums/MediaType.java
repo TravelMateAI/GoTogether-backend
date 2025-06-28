@@ -1,4 +1,4 @@
-package com.example.socialmediaservice.enums;
+package com.example.postservice.enums;
 
 public enum MediaType {
     IMAGE,

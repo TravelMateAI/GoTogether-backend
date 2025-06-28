@@ -1,6 +1,6 @@
 package com.example.postservice.entity;
 
-import com.example.socialmediaservice.enums.ReactionType;
+import com.example.postservice.enums.ReactionType;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;

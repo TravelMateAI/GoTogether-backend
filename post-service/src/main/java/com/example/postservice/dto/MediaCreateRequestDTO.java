@@ -1,6 +1,6 @@
-package com.example.socialmediaservice.dto;
+package com.example.postservice.dto;
 
-import com.example.socialmediaservice.enums.MediaType;
+import com.example.postservice.enums.MediaType;
 import lombok.Data;
 
 @Data

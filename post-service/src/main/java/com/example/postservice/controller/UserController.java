@@ -1,11 +1,11 @@
-package com.example.socialmediaservice.controller;
+package com.example.postservice.controller;
 
-import com.example.socialmediaservice.dto.FollowerInfo;
-import com.example.socialmediaservice.dto.LoginRequestDTO;
-import com.example.socialmediaservice.dto.UpdateProfileRequest;
-import com.example.socialmediaservice.dto.UpdateProfileResponse;
-import com.example.socialmediaservice.entity.User;
-import com.example.socialmediaservice.service.UserService;
+import com.example.postservice.dto.FollowerInfo;
+import com.example.postservice.dto.LoginRequestDTO;
+import com.example.postservice.dto.UpdateProfileRequest;
+import com.example.postservice.dto.UpdateProfileResponse;
+import com.example.postservice.entity.User;
+import com.example.postservice.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;

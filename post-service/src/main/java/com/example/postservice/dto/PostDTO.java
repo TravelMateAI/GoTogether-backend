@@ -1,7 +1,7 @@
-package com.example.socialmediaservice.dto;
+package com.example.postservice.dto;
 
-import com.example.socialmediaservice.enums.MediaType;
-import com.example.socialmediaservice.enums.ReactionType;
+import com.example.postservice.enums.MediaType;
+import com.example.postservice.enums.ReactionType;
 import lombok.Data;
 
 import java.time.LocalDateTime;

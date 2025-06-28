@@ -1,9 +1,9 @@
-package com.example.socialmediaservice.mapper;
+package com.example.postservice.mapper;
 
 
-import com.example.socialmediaservice.dto.CommentDTO;
-import com.example.socialmediaservice.dto.UserDTO;
-import com.example.socialmediaservice.entity.Comment;
+import com.example.postservice.dto.CommentDTO;
+import com.example.postservice.dto.UserDTO;
+import com.example.postservice.entity.Comment;
 
 import java.util.stream.Collectors;
 

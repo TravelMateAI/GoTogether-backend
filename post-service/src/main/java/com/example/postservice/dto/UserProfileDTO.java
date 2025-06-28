@@ -1,4 +1,4 @@
-package com.example.socialmediaservice.dto;
+package com.example.postservice.dto;
 
 public class UserProfileDTO {
 }

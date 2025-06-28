@@ -1,11 +1,11 @@
-package com.example.socialmediaservice.mapper;
+package com.example.postservice.mapper;
 
-import com.example.socialmediaservice.dto.CreatePostResponseDTO;
-import com.example.socialmediaservice.dto.MediaDTO;
-import com.example.socialmediaservice.dto.PostDTO;
-import com.example.socialmediaservice.dto.UserDTO;
-import com.example.socialmediaservice.entity.Media;
-import com.example.socialmediaservice.entity.Post;
+import com.example.postservice.dto.CreatePostResponseDTO;
+import com.example.postservice.dto.MediaDTO;
+import com.example.postservice.dto.PostDTO;
+import com.example.postservice.dto.UserDTO;
+import com.example.postservice.entity.Media;
+import com.example.postservice.entity.Post;
 
 import java.util.List;
 import java.util.stream.Collectors;

@@ -1,9 +1,9 @@
 package com.example.postservice.service;
 
-import com.example.socialmediaservice.entity.Comment;
-import com.example.socialmediaservice.entity.Post;
-import com.example.socialmediaservice.entity.User;
-import com.example.socialmediaservice.repository.CommentRepo;
+import com.example.postservice.entity.Comment;
+import com.example.postservice.entity.Post;
+import com.example.postservice.entity.User;
+import com.example.postservice.repository.CommentRepo;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;

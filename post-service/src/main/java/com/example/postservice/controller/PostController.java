@@ -1,9 +1,9 @@
-package com.example.socialmediaservice.controller;
+package com.example.postservice.controller;
 
-import com.example.socialmediaservice.dto.*;
-import com.example.socialmediaservice.service.CommentService;
-import com.example.socialmediaservice.service.PostService;
-import com.example.socialmediaservice.service.ReactionService;
+import com.example.postservice.dto.*;
+import com.example.postservice.service.CommentService;
+import com.example.postservice.service.PostService;
+import com.example.postservice.service.ReactionService;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
