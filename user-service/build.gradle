@@ -26,7 +26,7 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    // implementation 'org.springframework.boot:spring-boot-starter-mail' // Removed, not typical for user-service
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -35,23 +35,26 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-
-    runtimeOnly 'io.grpc:grpc-netty-shaded:1.52.1'
-    implementation 'io.grpc:grpc-protobuf:1.52.1'
-    implementation 'io.grpc:grpc-stub:1.52.1'
-    compileOnly 'org.apache.tomcat:annotations-api:6.0.53' // necessary for Java 9+
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
-
-    // grpc denendencies
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client' // User service might not need full oauth2-client, but keeping for now.
+    // Webflux is often included with gRPC starters, ensure it's here if needed, or managed by grpc-spring-boot-starter
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
+    // Core gRPC dependencies
+    implementation "io.grpc:grpc-protobuf:1.52.1"
+    implementation "io.grpc:grpc-stub:1.52.1"
+    runtimeOnly "io.grpc:grpc-netty-shaded:1.52.1"
 
+    // gRPC Spring Boot Starter (includes server and client)
+    implementation 'net.devh:grpc-spring-boot-starter:3.1.0.RELEASE'
+
+    // Annotation for gRPC services (javax.annotation-api or jakarta.annotation-api)
+    // Spring Boot 3 uses Jakarta EE 9+, so jakarta.annotation-api
+    implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
+    // tomcat annotations-api was likely for older javax.annotation, not needed if using jakarta
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    // testImplementation 'org.springframework.boot:spring-boot-starter-test' // Already included by default usually
 }
 
 

@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package com.example.Authservice.grpc; // Renamed
+
+option java_package = "com.example.Authservice.grpc"; // Renamed
+option java_multiple_files = true;
+
+// Service to provide authentication information, primarily via token introspection
+service AuthService {
+  // Introspects a token and returns user authentication information
+  rpc GetUserAuthInfoFromToken(GetUserAuthInfoFromTokenRequest) returns (UserAuthInfoResponse);
+  // Validates a token and returns basic validation status along with key user identifiers
+  rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse);
+}
+
+message GetUserAuthInfoFromTokenRequest {
+  string token = 1; // The Access Token or ID Token JWT string
+}
+
+message UserAuthInfoResponse {
+  string userId = 1;      // 'sub' claim
+  string username = 2;    // 'preferred_username' claim
+  repeated string roles = 3; // roles from 'realm_access' or 'resource_access'
+  bool active = 4;        // Typically true if token is valid
+  map<string, string> claims = 5; // Optionally include all string claims
+}
+
+message ValidateTokenRequest {
+  string token = 1; // The Access Token or ID Token JWT string
+}
+
+message ValidateTokenResponse {
+  string userId = 1;   // 'sub' claim
+  string username = 2; // 'preferred_username' claim
+  bool valid = 3;      // Is the token valid?
+  bool active = 4;     // Is the user/session considered active (derived from token validity)?
+  repeated string roles = 5;
+  int64 expiresAt = 6; // Token expiry timestamp (seconds since epoch)
+  int64 issuedAt = 7;  // Token issuance timestamp (seconds since epoch)
+}

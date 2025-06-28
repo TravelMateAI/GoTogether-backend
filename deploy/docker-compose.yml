@@ -181,3 +181,65 @@ services:
       - GIN_MODE=release
     networks:
       - kong-net
+
+  auth-service:
+    build:
+      context: ../auth-service
+      dockerfile: Dockerfile # Path relative to context
+    ports:
+      - "8081:8081" # APP_PORT
+      - "9091:9091" # GRPC_SERVER_PORT
+    networks:
+      - kong-net
+    environment:
+      # Database - Authservice is now stateless regarding user data storage
+      # - DB_HOST=aws-0-ap-southeast-1.pooler.supabase.com
+      # - DB_PORT=5432
+      # - DB_NAME=postgres
+      # - DB_USER=postgres.odffpjvuptssxaaggnsn
+      # - DB_PASSWORD=Postgres
+      # Keycloak & OAuth2 Client
+      - KEYCLOAK_ISSUER_URI=http://keycloak:8080/realms/kong # For internal configuration (OIDC discovery, JWKS)
+      - OAUTH_CLIENT_ID=kong
+      - OAUTH_CLIENT_SECRET= # MUST BE SET for the 'kong' client in Keycloak
+      - OAUTH_REDIRECT_URI=http://localhost:8000/login/oauth2/code/keycloak-login # Browser redirect via Kong
+      # JWT Settings for local tokens (Authservice issues these after Userservice validates credentials)
+      - JWT_SECRET=your-super-strong-jwt-secret-for-local-auth-must-be-at-least-32-chars # MUST BE CHANGED AND SECURED
+      - JWT_ACCESS_EXPIRATION_MS=3600000 # 1 hour
+      - JWT_REFRESH_EXPIRATION_MS=86400000 # 24 hours
+      # Ports for auth-service itself
+      - APP_PORT=8081
+      - GRPC_SERVER_PORT=9091
+      # User service gRPC location for auth-service's client
+      - USER_SERVICE_GRPC_HOST=user-service # Docker DNS name
+      - USER_SERVICE_GRPC_PORT=9092
+    depends_on:
+      - keycloak
+      - kong-database # If using the same DB instance as Keycloak/Kong's own DB. Or remove if DB is external like Supabase.
+                      # For Supabase, this explicit depends_on might not be needed unless there's a shared init script.
+    # command: ["./entrypoint.sh"] # Dockerfile already has ENTRYPOINT
+
+  user-service:
+    build:
+      context: ../user-service
+      dockerfile: Dockerfile # Path relative to context
+    ports:
+      - "8082:8082" # APP_PORT
+      - "9092:9092" # GRPC_SERVER_PORT
+    networks:
+      - kong-net
+    environment:
+      # Database
+      - DB_HOST=aws-0-ap-southeast-1.pooler.supabase.com # From user-service application.properties defaults
+      - DB_PORT=5432
+      - DB_NAME=postgres
+      - DB_USER=postgres.odffpjvuptssxaaggnsn
+      - DB_PASSWORD=Postgres # Needs to be the actual password for this user
+      # Keycloak Issuer for JWT validation
+      - KEYCLOAK_ISSUER_URI=http://keycloak:8080/realms/kong # For internal JWKS fetching
+      # Ports for user-service itself
+      - APP_PORT=8082
+      - GRPC_SERVER_PORT=9092
+    depends_on:
+      - keycloak # Good practice if it needs to fetch JWKS URI on startup, though often lazy loaded
+      # - auth-service # If there's a direct startup dependency

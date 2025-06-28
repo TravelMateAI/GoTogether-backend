@@ -1,0 +1,151 @@
+syntax = "proto3";
+
+package com.example.Userservice.grpc; // Renamed
+
+option java_package = "com.example.Userservice.grpc"; // Renamed
+option java_multiple_files = true;
+
+// Service to manage user profiles
+service UserService {
+  // Retrieves detailed user profile information
+  rpc GetUserDetails(GetUserDetailsRequest) returns (UserDetailsResponse);
+  // Creates a new user profile
+  rpc CreateUserProfile(CreateUserProfileRequest) returns (UserDetailsResponse);
+  // Updates an existing user profile
+  rpc UpdateUserProfile(UpdateUserProfileRequest) returns (UserDetailsResponse);
+  // Gets basic user information
+  rpc GetUserBasicInfo(GetUserBasicInfoRequest) returns (UserBasicInfoResponse);
+  // Gets user by username
+  rpc GetUserByUsername(GetUserByUsernameRequest) returns (UserDetailsResponse);
+  // Gets user by email
+  rpc GetUserByEmail(GetUserByEmailRequest) returns (UserDetailsResponse);
+
+  // Follow services
+  rpc FollowUser(FollowUserRequest) returns (FollowUserResponse);
+  rpc UnfollowUser(UnfollowUserRequest) returns (UnfollowUserResponse);
+  rpc GetFollowers(GetFollowListRequest) returns (GetFollowListResponse);
+  rpc GetFollowing(GetFollowListRequest) returns (GetFollowListResponse);
+  rpc GetFollowCounts(GetFollowCountsRequest) returns (GetFollowCountsResponse);
+
+  // RPCs for local account management by Authservice
+  rpc CreateLocalAccount(CreateLocalAccountRequest) returns (UserDetailsResponse);
+  rpc AuthenticateLocalAccount(AuthenticateLocalAccountRequest) returns (AuthenticationResponse);
+}
+
+message UserDetails {
+  string userId = 1;
+  string username = 2;
+  string firstName = 3;
+  string lastName = 4;
+  string email = 5;
+  string avatarUrl = 6;
+  // string bio = 7;
+}
+
+message GetUserDetailsRequest {
+  string userId = 1;
+}
+
+message UserDetailsResponse {
+  UserDetails userDetails = 1;
+}
+
+message CreateUserProfileRequest {
+  string userId = 1;
+  string username = 2;
+  string email = 3;
+  string firstName = 4;
+  string lastName = 5;
+  string avatarUrl = 6;
+}
+
+message UpdateUserProfileRequest {
+  string userId = 1; // User whose profile is being updated
+  string firstName = 2;
+  string lastName = 3;
+  string avatarUrl = 4;
+}
+
+message GetUserBasicInfoRequest {
+  string userId = 1;
+}
+
+message UserBasicInfoResponse {
+  string userId = 1;
+  string username = 2;
+  string displayName = 3;
+  string avatarUrl = 4;
+}
+
+message GetUserByUsernameRequest {
+  string username = 1;
+}
+
+message GetUserByEmailRequest {
+  string email = 1;
+}
+
+// Follow/Unfollow Messages
+message FollowUserRequest {
+  string requestorUserId = 1; // The user performing the follow action (authenticated user)
+  string targetUserId = 2;  // The user to be followed
+}
+
+message FollowUserResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message UnfollowUserRequest {
+  string requestorUserId = 1; // The user performing the unfollow action
+  string targetUserId = 2;  // The user to be unfollowed
+}
+
+message UnfollowUserResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message GetFollowListRequest {
+  string userId = 1; // User whose follower/following list is requested
+  // Add pagination fields if needed: int32 page = 2; int32 size = 3;
+}
+
+message GetFollowListResponse {
+  repeated UserDetails users = 1;
+}
+
+message GetFollowCountsRequest {
+  string userId = 1;
+}
+
+message GetFollowCountsResponse {
+  string userId = 1;
+  int64 followerCount = 2;
+  int64 followingCount = 3;
+}
+
+// --- Messages for Local Account Management by Authservice ---
+message CreateLocalAccountRequest {
+  string username = 1;
+  string email = 2;
+  string password = 3; // Plain password, Userservice will hash it
+  string roles = 4;    // Optional, comma-separated
+}
+// UserDetailsResponse is reused for the response of CreateLocalAccount
+
+message AuthenticateLocalAccountRequest {
+  string username = 1;
+  string password = 2; // Plain password
+}
+
+message AuthenticationResponse {
+  string userId = 1;
+  string username = 2;
+  string email = 3;
+  string roles = 4; // Comma-separated
+  bool active = 5; // Is the account active/enabled
+  bool isValid = 6; // Were credentials valid?
+  string errorMessage = 7; // If !isValid
+  UserDetails userDetails = 8; // Full details if valid
+}

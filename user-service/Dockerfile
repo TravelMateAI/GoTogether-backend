@@ -12,7 +12,7 @@ VOLUME /tmp
 COPY build/libs/*.jar app.jar
 
 # Expose the port on which the service runs
-EXPOSE 8080
+EXPOSE 8082 9092 # Expose configured web and gRPC ports
 
 # Run the application
 ENTRYPOINT ["java", "-jar", "/app.jar"]

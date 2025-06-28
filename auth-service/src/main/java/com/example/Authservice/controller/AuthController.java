@@ -1,212 +1,126 @@
-package com.example.socialmediaservice.controller;
+package com.example.Authservice.controller; // Renamed
 
-import com.example.socialmediaservice.service.AuthService;
-// import com.example.socialmediaservice.service.UserService; // Only needed if serializeUser were to call userService directly for some reason.
-import com.example.socialmediaservice.dto.LoginRequestDTO;
-import com.example.socialmediaservice.entity.User;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.Authservice.controller.dto.JwtAuthenticationResponseDto;
+import com.example.Authservice.controller.dto.LoginRequestDto;
+import com.example.Authservice.controller.dto.TokenRefreshRequestDto;
+import com.example.Authservice.controller.dto.UserRegistrationRequestDto;
+import com.example.Authservice.model.LocalUser;
+import com.example.Authservice.service.Authservice;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.web.bind.annotation.*; // For CookieValue
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.HashMap;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-@RequiredArgsConstructor
-@Slf4j
-@CrossOrigin(origins = {"http://localhost:3000", "https://go-together-uom.vercel.app"}, allowCredentials = "true")
 public class AuthController {
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
-    private final AuthService authService;
+    private final Authservice authservice;
+    private final OAuth2AuthorizedClientService authorizedClientService;
 
-    // serializeUser method copied from UserController
-    public String serializeUser(User user) {
-        ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    public AuthController(Authservice authservice, OAuth2AuthorizedClientService authorizedClientService) {
+        this.authservice = authservice;
+        this.authorizedClientService = authorizedClientService;
+    }
+
+    // --- Local Authentication Endpoints ---
+    @PostMapping("/register")
+    public ResponseEntity<?> registerLocalUser(@Valid @RequestBody UserRegistrationRequestDto registrationRequest) {
         try {
-            Map<String, Object> minimalUser = new HashMap<>();
-            minimalUser.put("userId", user.getUserId());
-            minimalUser.put("username", user.getUsername());
-            minimalUser.put("firstName", user.getFirstName());
-            minimalUser.put("email", user.getEmail());
-            minimalUser.put("avatarUrl", user.getAvatarUrl());
-            minimalUser.put("bio", user.getBio());
-
-            String json = objectMapper.writeValueAsString(minimalUser);
-            return Base64.getUrlEncoder().encodeToString(json.getBytes(StandardCharsets.UTF_8));
-        } catch (JsonProcessingException e) {
-            log.error("Failed to serialize user for cookie", e);
-            throw new RuntimeException("Failed to serialize user for cookie", e);
-        }
-    }
-
-    @PostMapping("/login") // Was /api/users/auth/login
-    public ResponseEntity<?> login(@RequestBody LoginRequestDTO loginRequest, HttpServletResponse response) {
-        AuthService.TokenResponse tokenDetails = authService.loginWithPassword(loginRequest.getUsername(), loginRequest.getPassword());
-        String accessToken = tokenDetails.getAccessToken();
-        String refreshTokenValue = tokenDetails.getRefreshToken(); // Renamed to avoid conflict with method param name
-        long expiresIn = tokenDetails.getExpiresIn();
-
-        User user = authService.getUserByEmailFromToken(accessToken);
-        if (user != null) {
-            user.setPosts(null);
-        } else {
-            // Handle case where user might be null after token validation, though unlikely if token is valid
-            log.error("User not found for a valid access token: {}", accessToken);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "User details not found after login."));
-        }
-
-
-        String accessTokenCookieHeader = ResponseCookie.from("access_token", accessToken)
-                .httpOnly(true)
-                .secure(false)
-                .path("/")
-                .maxAge(expiresIn)
-                .build().toString() + "; SameSite=Lax";
-        response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookieHeader);
-
-        if (refreshTokenValue != null && !refreshTokenValue.isEmpty()) {
-            long refreshTokenMaxAge = 2592000; // 30 days
-            String refreshTokenCookieHeader = ResponseCookie.from("refresh_token", refreshTokenValue)
-                    .httpOnly(true)
-                    .secure(false)
-                    .path("/api/auth/refresh") // Path for refresh token cookie, specific to auth controller
-                    .maxAge(refreshTokenMaxAge)
-                    .build().toString() + "; SameSite=Lax";
-            response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookieHeader);
-            log.info("Refresh token cookie set for user {}.", user.getUsername());
-        } else {
-            log.warn("Refresh token was null or empty for user {}. Refresh token cookie not set.", user.getUsername());
-        }
-
-        String userCookieHeader = ResponseCookie.from("user", serializeUser(user))
-                .httpOnly(false)
-                .secure(false)
-                .path("/")
-                .maxAge(expiresIn)
-                .build().toString() + "; SameSite=Lax";
-        response.addHeader(HttpHeaders.SET_COOKIE, userCookieHeader);
-
-        log.info("User {} login successful", user.getUsername());
-
-        return ResponseEntity.ok(Map.of(
-                "accessToken", accessToken,
-                "expiresIn", expiresIn,
-                "user", serializeUser(user)
-        ));
-    }
-
-    @GetMapping("/login/oauth2/code/google") // Was /api/users/login/oauth2/code/google
-    public ResponseEntity<?> handleGoogleCallback(@AuthenticationPrincipal OAuth2User principal, HttpServletResponse response) {
-        if (principal == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication failed: No principal found.");
-        }
-
-        Map<String, Object> authProcessingResponse = authService.processOAuth2Login(principal);
-        String token = (String) authProcessingResponse.get("token"); // This is the placeholder token from processOAuth2Login
-        User user = (User) authProcessingResponse.get("user");
-
-        if (user == null) {
-            log.error("User object was null after OAuth2 processing for principal: {}", principal.getName());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "User processing failed after OAuth2 login."));
-        }
-        user.setPosts(null);
-
-
-        // TODO: The token from processOAuth2Login is a placeholder.
-        // In a real OAuth2 setup, this token would be the actual Keycloak session token or ID token.
-        // For now, using a fixed maxAge as the placeholder token has no real expiry.
-        long oauthTokenMaxAge = 3600; // Example: 1 hour for OAuth2 login session token
-
-        String accessTokenCookieHeader = ResponseCookie.from("access_token", token)
-                .httpOnly(true)
-                .secure(false)
-                .path("/")
-                .maxAge(oauthTokenMaxAge) // Placeholder expiry
-                .build().toString() + "; SameSite=Lax";
-        response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookieHeader);
-
-        String userCookieHeader = ResponseCookie.from("user", serializeUser(user))
-                .httpOnly(false)
-                .secure(false)
-                .path("/")
-                .maxAge(oauthTokenMaxAge) // Placeholder expiry
-                .build().toString() + "; SameSite=Lax";
-        response.addHeader(HttpHeaders.SET_COOKIE, userCookieHeader);
-
-        log.info("OAuth2 callback for user {} successful. Placeholder token issued.", user.getEmail());
-        return ResponseEntity.ok(Map.of(
-                "accessToken", token, // Placeholder token
-                "user", serializeUser(user)
-        ));
-    }
-
-    @PostMapping("/refresh") // Was /api/users/auth/refresh
-    public ResponseEntity<?> refreshToken(@CookieValue(name = "refresh_token", required = false) String refreshTokenValue, HttpServletResponse response) {
-        if (refreshTokenValue == null || refreshTokenValue.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Missing refresh token"));
-        }
-
-        try {
-            AuthService.TokenResponse tokenDetails = authService.refreshAccessToken(refreshTokenValue);
-            String newAccessToken = tokenDetails.getAccessToken();
-            long newExpiresIn = tokenDetails.getExpiresIn();
-            String newRefreshToken = tokenDetails.getRefreshToken();
-
-            String newAccessTokenCookieHeader = ResponseCookie.from("access_token", newAccessToken)
-                    .httpOnly(true)
-                    .secure(false)
-                    .path("/")
-                    .maxAge(newExpiresIn)
-                    .build().toString() + "; SameSite=Lax";
-            response.addHeader(HttpHeaders.SET_COOKIE, newAccessTokenCookieHeader);
-
-            if (newRefreshToken != null && !newRefreshToken.isEmpty() && !newRefreshToken.equals(refreshTokenValue)) {
-                long refreshTokenMaxAge = 2592000; // 30 days
-                String newRefreshTokenCookieHeader = ResponseCookie.from("refresh_token", newRefreshToken)
-                        .httpOnly(true)
-                        .secure(false)
-                        .path("/api/auth/refresh") // Consistent path
-                        .maxAge(refreshTokenMaxAge)
-                        .build().toString() + "; SameSite=Lax";
-                response.addHeader(HttpHeaders.SET_COOKIE, newRefreshTokenCookieHeader);
-                log.info("Refresh token was rotated. New refresh_token cookie set.");
-            }
-
-            User user = authService.getUserByEmailFromToken(newAccessToken);
-            if (user != null) {
-                user.setPosts(null);
-                String userCookieHeader = ResponseCookie.from("user", serializeUser(user))
-                        .httpOnly(false)
-                        .secure(false)
-                        .path("/")
-                        .maxAge(newExpiresIn)
-                        .build().toString() + "; SameSite=Lax";
-                response.addHeader(HttpHeaders.SET_COOKIE, userCookieHeader);
-            } else {
-                log.warn("User could not be fetched with new access token during refresh. User cookie not updated.");
-            }
-
-            log.info("Access token refreshed successfully.");
-            return ResponseEntity.ok(Map.of(
-                    "accessToken", newAccessToken,
-                    "expiresIn", newExpiresIn
-            ));
-
+            LocalUser user = authservice.registerLocalUser(registrationRequest);
+            // Consider what to return. Maybe just a success message or user info without password.
+            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "User registered successfully!", "userId", user.getId(), "username", user.getUsername()));
         } catch (RuntimeException e) {
-            log.error("Error refreshing token: {}", e.getMessage(), e); // Added exception to log
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid or expired refresh token", "detail", e.getMessage()));
+            logger.error("Registration error: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> loginLocalUser(@Valid @RequestBody LoginRequestDto loginRequest) {
+        try {
+            Map<String, String> tokens = authservice.loginLocalUser(loginRequest);
+            return ResponseEntity.ok(new JwtAuthenticationResponseDto(tokens.get("accessToken"), tokens.get("refreshToken")));
+        } catch (Exception e) { // Catch specific Spring Security AuthenticationException for better messages
+            logger.error("Local login error for user {}: {}", loginRequest.getUsername(), e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Login failed: Invalid credentials or user not found."));
+        }
+    }
+
+    @PostMapping("/token/refresh/local")
+    public ResponseEntity<?> refreshLocalUserToken(@Valid @RequestBody TokenRefreshRequestDto refreshRequest) {
+        try {
+            Map<String, String> tokens = authservice.refreshLocalUserToken(refreshRequest.getRefreshToken());
+            return ResponseEntity.ok(new JwtAuthenticationResponseDto(tokens.get("accessToken"), tokens.get("refreshToken"))); // refreshToken might be null if not re-issued
+        } catch (RuntimeException e) {
+            logger.error("Local token refresh error: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    // --- OAuth2 / Keycloak Related Endpoints ---
+    @GetMapping("/session") // Called after successful OIDC login redirect
+    public ResponseEntity<Map<String, Object>> getOidcSessionInfo(@AuthenticationPrincipal OidcUser principal, OAuth2AuthenticationToken authenticationToken) {
+        if (principal == null || authenticationToken == null) {
+             logger.warn("/session endpoint called without OIDC principal or authentication token.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Not authenticated via OIDC."));
+        }
+        String clientRegistrationId = authenticationToken.getAuthorizedClientRegistrationId();
+        OAuth2AuthorizedClient authorizedClient = authorizedClientService.loadAuthorizedClient(
+                clientRegistrationId,
+                principal.getName());
+
+        return ResponseEntity.ok(authservice.buildTokenResponse(principal, authorizedClient));
+    }
+
+    @GetMapping("/user/me") // For users logged in via OIDC
+    public ResponseEntity<Map<String, Object>> getOidcUserMe(@AuthenticationPrincipal OidcUser principal) {
+        if (principal == null) {
+            logger.warn("/user/me endpoint called without OIDC principal.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Not authenticated via OIDC."));
+        }
+        return ResponseEntity.ok(authservice.buildUserInfoResponse(principal));
+    }
+
+    // Keycloak direct refresh (if still needed, or prefer local JWTs if mixing)
+    // This endpoint was calling authservice.refreshTokens which is a direct keycloak call
+    @PostMapping("/token/refresh/keycloak")
+    public ResponseEntity<?> refreshKeycloakToken(@Valid @RequestBody TokenRefreshRequestDto refreshTokenRequest) {
+        if (refreshTokenRequest == null || refreshTokenRequest.getRefreshToken() == null || refreshTokenRequest.getRefreshToken().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Refresh token is required."));
+        }
+        try {
+            Map<String, Object> tokenResponse = authservice.refreshTokens(refreshTokenRequest.getRefreshToken()); // This is the Keycloak refresh
+            return ResponseEntity.ok(tokenResponse);
+        } catch (Exception e) {
+            logger.error("Keycloak token refresh error: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid Keycloak refresh token or refresh failed", "details", e.getMessage()));
+        }
+    }
+
+    // Logout is primarily handled by SecurityConfig redirecting to Keycloak's end_session_endpoint.
+    // Client should call GET /api/auth/perform_logout (or the configured logoutUrl in SecurityConfig)
+    // This POST endpoint can remain if a specific backend action is needed before initiating logout.
+    @PostMapping("/logout_trigger")
+    public ResponseEntity<String> triggerLogout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+        // The actual logout (session invalidation, OIDC logout) is configured in SecurityConfig
+        // This endpoint might not be strictly necessary if clients directly use the Spring Security logout URL.
+        logger.info("Logout trigger endpoint called. Spring Security logout handler should take over via configured logout URL.");
+        return ResponseEntity.ok("Logout process initiated. Client will be redirected by Spring Security if configured, or should clear local tokens.");
     }
 }

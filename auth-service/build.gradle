@@ -25,33 +25,42 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    // implementation 'org.springframework.boot:spring-boot-starter-data-jpa' // Removed again
+    implementation 'org.springframework.boot:spring-boot-starter-mail' // Keep if auth-service sends emails
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     compileOnly 'org.projectlombok:lombok'
-    runtimeOnly 'org.postgresql:postgresql'
+    // runtimeOnly 'org.postgresql:postgresql' // Removed again
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    implementation 'org.springframework.boot:spring-boot-starter-security' // Ensure core security is present
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server' // For validating tokens if Authservice exposes secured gRPC
+    implementation 'org.springframework.boot:spring-boot-starter-webflux' // Webflux for reactive OAuth2 client or gRPC
 
-    runtimeOnly 'io.grpc:grpc-netty-shaded:1.52.1'
-    implementation 'io.grpc:grpc-protobuf:1.52.1'
-    implementation 'io.grpc:grpc-stub:1.52.1'
-    compileOnly 'org.apache.tomcat:annotations-api:6.0.53' // necessary for Java 9+
+    // JWT Library for local token generation/validation
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5' // Or jjwt-gson if you prefer Gson
+
+    // Core gRPC dependencies
+    implementation "io.grpc:grpc-protobuf:1.52.1"
+    implementation "io.grpc:grpc-stub:1.52.1"
+    runtimeOnly "io.grpc:grpc-netty-shaded:1.52.1"
+
+    // gRPC Spring Boot Starter (includes server and client)
+    implementation 'net.devh:grpc-spring-boot-starter:3.1.0.RELEASE'
+
+    // Annotation for gRPC services (javax.annotation-api or jakarta.annotation-api)
+    // Spring Boot 3 uses Jakarta EE 9+, so jakarta.annotation-api
+    implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
+    // tomcat annotations-api was likely for older javax.annotation, not needed if using jakarta
+
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
-
-    // grpc denendencies
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    implementation 'org.springframework.boot:spring-boot-starter-webflux'
-
-
+    // testImplementation 'org.springframework.boot:spring-boot-starter-test' // Already included by default usually
 }
 
 
